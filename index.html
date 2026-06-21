@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sam's Running Dashboard</title>
-<!-- updated: 2026-06-21 16:37 -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -543,8 +542,11 @@
       <span class="card-title">This Week</span>
       <span class="card-badge" id="weekBadge">Week —</span>
     </div>
-    <div class="week-grid" id="weekBars"></div>
-    <div class="progress-labels" style="margin-top:16px">
+    <!-- bars only, no labels inside -->
+    <div id="weekBars" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:flex-end;height:90px;margin-bottom:4px"></div>
+    <!-- day labels row, separate -->
+    <div id="weekDayLabels" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:16px"></div>
+    <div class="progress-labels">
       <span id="weekKmDone">— km done</span>
       <span id="weekTarget">target: — km</span>
     </div>
@@ -750,11 +752,16 @@ function getMonday(d) {
 
 function getWeekNumber() {
   const diff = new Date() - BLOCK_START;
+  if (diff < 0) return -1; // pre-block
   const week = Math.floor(diff / (7 * 24 * 3600 * 1000));
-  return Math.max(0, Math.min(week, WEEKLY_TARGETS.length - 1));
+  return Math.min(week, WEEKLY_TARGETS.length - 1);
 }
 
-function getWeekTarget() { return WEEKLY_TARGETS[getWeekNumber()] || 0; }
+function getWeekTarget() {
+  const wk = getWeekNumber();
+  if (wk < 0) return 0;
+  return WEEKLY_TARGETS[wk] || 0;
+}
 
 function fmtKm(m)  { return (m / 1000).toFixed(1); }
 function fmtDist(m){ return `${fmtKm(m)} km`; }
@@ -862,25 +869,28 @@ function renderWeek(weekRuns) {
   const todayIdx = (now.getDay() + 6) % 7;
   const totalKm  = dayKms.reduce((a,b) => a + b, 0) / 1000;
   const target   = getWeekTarget();
-  const weekNum  = getWeekNumber() + 1;
+  const weekNum  = getWeekNumber();
   const maxKm    = Math.max(...dayKms, 1);
 
-  document.getElementById('weekBadge').textContent     = `Week ${weekNum}`;
+  document.getElementById('weekBadge').textContent     = weekNum < 0 ? 'Pre-Block' : `Week ${weekNum + 1}`;
   document.getElementById('weekKmDone').textContent    = `${totalKm.toFixed(1)} km done`;
-  document.getElementById('weekTarget').textContent    = `target: ${target} km`;
-  document.getElementById('weekProgressFill').style.width = Math.min(100, (totalKm / target) * 100) + '%';
+  document.getElementById('weekTarget').textContent    = weekNum < 0 ? 'block starts 22 Jun' : `target: ${target} km`;
+  document.getElementById('weekProgressFill').style.width = (target > 0 ? Math.min(100, (totalKm / target) * 100) : 0) + '%';
 
-  const barsEl = document.getElementById('weekBars');
+  const barsEl   = document.getElementById('weekBars');
+  const labelsEl = document.getElementById('weekDayLabels');
   barsEl.innerHTML = '';
+  labelsEl.innerHTML = '';
+
   days.forEach((day, i) => {
-    const km   = dayKms[i] / 1000;
-    const pct  = km > 0 ? Math.max(8, (km / (maxKm / 1000)) * 100) : 0;
+    const km  = dayKms[i] / 1000;
+    const pct = km > 0 ? Math.max(8, (km / (maxKm / 1000)) * 90) : 10;
     barsEl.innerHTML += `
-      <div class="day-bar-wrap">
-        <div class="day-km">${km > 0 ? km.toFixed(1) : ''}</div>
-        <div class="day-bar${km === 0 ? ' empty' : ''}${i === todayIdx ? ' today' : ''}" style="height:${km > 0 ? pct : 10}px"></div>
-        <div class="day-label">${day}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end">
+        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted)">${km > 0 ? km.toFixed(1) : ''}</div>
+        <div class="day-bar${km === 0 ? ' empty' : ''}${i === todayIdx ? ' today' : ''}" style="width:100%;height:${pct}px;border-radius:4px 4px 0 0"></div>
       </div>`;
+    labelsEl.innerHTML += `<div style="text-align:center;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase">${day}</div>`;
   });
 }
 
@@ -1145,15 +1155,29 @@ function renderHRTrend(runs) {
 }
 
 // ── Render: Cadence ──────────────────────────────────────────────────────────
-function renderCadence(runs) {
+async function renderCadence(runs, token) {
+  // Try list data first (works if watch records it)
   const withCad = [...runs]
     .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
-    .slice(0,30)
+    .slice(0,10)
     .filter(r => r.average_cadence);
 
-  if (!withCad.length) { document.getElementById('cadenceVal').textContent = '—'; return; }
-  const avg = withCad.reduce((a,r) => a + r.average_cadence, 0) / withCad.length;
-  document.getElementById('cadenceVal').textContent = Math.round(avg * 2); // one-foot → total
+  if (withCad.length) {
+    const avg = withCad.reduce((a,r) => a + r.average_cadence, 0) / withCad.length;
+    document.getElementById('cadenceVal').textContent = Math.round(avg * 2);
+    return;
+  }
+
+  // Fallback: fetch detail for last 5 runs
+  const last5 = [...runs].sort((a,b) => new Date(b.start_date) - new Date(a.start_date)).slice(0,5);
+  let total = 0, count = 0;
+  for (const run of last5) {
+    try {
+      const detail = await stravaGet(`/activities/${run.id}`, token);
+      if (detail.average_cadence) { total += detail.average_cadence; count++; }
+    } catch(e) {}
+  }
+  document.getElementById('cadenceVal').textContent = count > 0 ? Math.round((total / count) * 2) : '—';
 }
 
 // ── Render: Streak ───────────────────────────────────────────────────────────
@@ -1242,10 +1266,19 @@ function renderWeeklyTargetPct(runs) {
 }
 
 // ── Render: Calories ─────────────────────────────────────────────────────────
-function renderCalories(weekRuns) {
-  const total = weekRuns.reduce((a,r) => {
-    return a + (r.calories || (r.kilojoules ? r.kilojoules * 0.239 : 0));
-  }, 0);
+async function renderCalories(weekRuns, token) {
+  // Try summary field first
+  let total = weekRuns.reduce((a,r) => a + (r.calories || r.total_calories || 0), 0);
+
+  // If zero, fetch detail for each week run (usually 1-5 runs)
+  if (total === 0 && weekRuns.length) {
+    for (const run of weekRuns) {
+      try {
+        const detail = await stravaGet(`/activities/${run.id}`, token);
+        total += detail.calories || 0;
+      } catch(e) {}
+    }
+  }
   document.getElementById('caloriesVal').textContent = total > 0 ? Math.round(total).toLocaleString() : '—';
 }
 
@@ -1253,61 +1286,4 @@ function renderCalories(weekRuns) {
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const code   = params.get('code');
-  let token    = sessionStorage.getItem('strava_token');
-
-  if (code) {
-    window.history.replaceState({}, '', window.location.pathname);
-    try {
-      const data = await exchangeCode(code);
-      token = data.access_token;
-      sessionStorage.setItem('strava_token', token);
-    } catch(e) {
-      console.error(e);
-      document.getElementById('connectOverlay').classList.add('show');
-      return;
-    }
-  }
-
-  if (!token) {
-    document.getElementById('connectOverlay').classList.add('show');
-    return;
-  }
-
-  const btn = document.getElementById('stravaBtn');
-  btn.innerHTML = stravaIcon() + ' Connected ✓';
-  btn.classList.add('connected');
-  document.getElementById('connectOverlay').classList.remove('show');
-
-  try {
-    const runs     = await fetchAllActivities(token);
-    const monday   = getMonday(new Date());
-    const weekRuns = runs.filter(r => new Date(r.start_date_local) >= monday);
-
-    renderWeek(weekRuns);
-    renderPRs(runs);
-    renderMonthly(runs);
-    renderActivities(runs);
-    renderHRZones(runs);
-    renderPaceTrend(runs);
-    renderHRTrend(runs);
-    renderCadence(runs);
-    renderStreak(runs);
-    renderDaysComparison(runs);
-    renderWeeklyTargetPct(runs);
-    renderCalories(weekRuns);
-
-  } catch(e) {
-    console.error(e);
-    if (e.message.includes('401') || e.message.includes('403')) {
-      sessionStorage.removeItem('strava_token');
-      btn.innerHTML = stravaIcon() + ' Connect Strava';
-      btn.classList.remove('connected');
-      document.getElementById('connectOverlay').classList.add('show');
-    }
-  }
-}
-
-init();
-</script>
-</body>
-</html>
+  let token    = s
