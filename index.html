@@ -896,6 +896,8 @@ function renderWeek(weekRuns) {
 
 // ── Render: PRs ──────────────────────────────────────────────────────────────
 function renderPRs(runs) {
+  // Exclude runs with bad GPS (name contains "ngaco")
+  runs = runs.filter(r => !r.name.toLowerCase().includes('ngaco'));
   const prs = {
     '1 km':         { best: 0, name: '', date: '' },
     '5 km':         { best: 0, name: '', date: '' },
@@ -1334,13 +1336,4 @@ async function init() {
     if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
       sessionStorage.removeItem('strava_token');
       btn.innerHTML = stravaIcon() + ' Connect Strava';
-      btn.classList.remove('connected');
-      document.getElementById('connectOverlay').classList.add('show');
-    }
-  }
-}
-
-init();
-</script>
-</body>
-</html>
+      btn.classList.remove('connecte
