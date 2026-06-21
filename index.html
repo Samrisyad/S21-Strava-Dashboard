@@ -1286,4 +1286,61 @@ async function renderCalories(weekRuns, token) {
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const code   = params.get('code');
-  let token    = s
+  let token    = sessionStorage.getItem('strava_token');
+
+  if (code) {
+    window.history.replaceState({}, '', window.location.pathname);
+    try {
+      const data = await exchangeCode(code);
+      token = data.access_token;
+      sessionStorage.setItem('strava_token', token);
+    } catch(e) {
+      console.error(e);
+      document.getElementById('connectOverlay').classList.add('show');
+      return;
+    }
+  }
+
+  if (!token) {
+    document.getElementById('connectOverlay').classList.add('show');
+    return;
+  }
+
+  const btn = document.getElementById('stravaBtn');
+  btn.innerHTML = stravaIcon() + ' Connected ✓';
+  btn.classList.add('connected');
+  document.getElementById('connectOverlay').classList.remove('show');
+
+  try {
+    const runs     = await fetchAllActivities(token);
+    const monday   = getMonday(new Date());
+    const weekRuns = runs.filter(r => new Date(r.start_date_local) >= monday);
+
+    renderWeek(weekRuns);
+    renderPRs(runs);
+    renderMonthly(runs);
+    renderActivities(runs);
+    renderHRZones(runs);
+    renderPaceTrend(runs);
+    renderHRTrend(runs);
+    renderCadence(runs, token);
+    renderStreak(runs);
+    renderDaysComparison(runs);
+    renderWeeklyTargetPct(runs);
+    renderCalories(weekRuns, token);
+
+  } catch(e) {
+    console.error(e);
+    if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
+      sessionStorage.removeItem('strava_token');
+      btn.innerHTML = stravaIcon() + ' Connect Strava';
+      btn.classList.remove('connected');
+      document.getElementById('connectOverlay').classList.add('show');
+    }
+  }
+}
+
+init();
+</script>
+</body>
+</html>
