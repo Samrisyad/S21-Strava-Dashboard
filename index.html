@@ -10,491 +10,101 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root[data-theme="dark"] {
-    --bg: #0D0D14;
-    --surface: #13131F;
-    --surface2: #1A1A2E;
-    --border: #2A2A45;
-    --text: #E8E8F0;
-    --muted: #6B6B8A;
-    --blue: #4F8EF7;
-    --teal: #2DD4BF;
-    --red: #F87171;
-    --violet: #A78BFA;
-    --amber: #FBBF24;
-    --green: #34D399;
+    --bg: #0D0D14; --surface: #13131F; --surface2: #1A1A2E; --border: #2A2A45;
+    --text: #E8E8F0; --muted: #6B6B8A; --blue: #4F8EF7; --teal: #2DD4BF;
+    --red: #F87171; --violet: #A78BFA; --amber: #FBBF24; --green: #34D399;
   }
   :root[data-theme="light"] {
-    --bg: #F4F4F8;
-    --surface: #FFFFFF;
-    --surface2: #EEEEF6;
-    --border: #D1D1E0;
-    --text: #111122;
-    --muted: #7070A0;
-    --blue: #2563EB;
-    --teal: #0D9488;
-    --red: #DC2626;
-    --violet: #7C3AED;
-    --amber: #D97706;
-    --green: #059669;
+    --bg: #F4F4F8; --surface: #FFFFFF; --surface2: #EEEEF6; --border: #D1D1E0;
+    --text: #111122; --muted: #7070A0; --blue: #2563EB; --teal: #0D9488;
+    --red: #DC2626; --violet: #7C3AED; --amber: #D97706; --green: #059669;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-
+  body { background: var(--bg); color: var(--text); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; }
   .mono { font-family: 'DM Mono', monospace; }
 
-  /* ── Header ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 32px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 100;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    font-size: 16px;
-  }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; }
   .logo svg { color: var(--blue); }
-
   .header-right { display: flex; align-items: center; gap: 12px; }
-
-  .theme-toggle {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.2s;
-  }
+  .theme-toggle { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; padding: 6px 10px; border-radius: 8px; font-size: 16px; transition: all 0.2s; }
   .theme-toggle:hover { color: var(--text); border-color: var(--blue); }
-
-  .strava-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #FC4C02;
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    transition: opacity 0.2s;
-  }
+  .strava-btn { display: flex; align-items: center; gap: 8px; background: #FC4C02; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; transition: opacity 0.2s; }
   .strava-btn:hover { opacity: 0.85; }
   .strava-btn.connected { background: var(--green); color: #000; }
 
-  /* ── Layout ── */
-  main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 24px;
-    display: grid;
-    gap: 24px;
-  }
-
+  main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; display: grid; gap: 24px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
   .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 24px; }
 
-  /* ── Cards ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .card-badge { font-size: 11px; font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 6px; background: var(--surface2); color: var(--muted); }
 
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
-  .card-title {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
-
-  .card-badge {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: var(--surface2);
-    color: var(--muted);
-  }
-
-  /* ── Week bars ── */
-  .week-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    align-items: flex-end;
-    height: 100px;
-    margin-bottom: 8px;
-  }
-
-  .day-bar-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .day-bar {
-    width: 100%;
-    border-radius: 4px 4px 0 0;
-    background: var(--blue);
-    opacity: 0.7;
-    transition: opacity 0.2s;
-    min-height: 4px;
-  }
+  .day-bar { background: var(--blue); opacity: 0.7; transition: opacity 0.2s; border-radius: 4px 4px 0 0; }
   .day-bar.today { opacity: 1; background: var(--teal); }
   .day-bar.empty { background: var(--border); opacity: 1; }
 
-  .day-label {
-    font-size: 10px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    text-transform: uppercase;
-  }
-  .day-km {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-  }
+  .progress-bar-bg { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--teal)); border-radius: 99px; transition: width 0.5s ease; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
 
-  .progress-bar-bg {
-    height: 6px;
-    background: var(--surface2);
-    border-radius: 99px;
-    overflow: hidden;
-    margin-top: 8px;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--blue), var(--teal));
-    border-radius: 99px;
-    transition: width 0.5s ease;
-  }
+  .pr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pr-item { background: var(--surface2); border-radius: 12px; padding: 14px 16px; }
+  .pr-distance { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .pr-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--amber); }
+  .pr-subvalue { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .progress-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* ── PRs ── */
-  .pr-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .pr-item {
-    background: var(--surface2);
-    border-radius: 12px;
-    padding: 14px 16px;
-  }
-
-  .pr-distance {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 4px;
-  }
-
-  .pr-value {
-    font-family: 'DM Mono', monospace;
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--amber);
-  }
-
-  .pr-subvalue {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* ── Monthly chart ── */
-  .month-bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    height: 120px;
-    margin-bottom: 8px;
-  }
-
-  .month-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .month-bar {
-    width: 100%;
-    border-radius: 4px 4px 0 0;
-    background: var(--violet);
-    opacity: 0.7;
-    min-height: 4px;
-  }
+  .month-bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; margin-bottom: 8px; }
+  .month-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; height: 100%; justify-content: flex-end; }
+  .month-bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--violet); opacity: 0.7; min-height: 4px; }
   .month-bar.current { opacity: 1; background: var(--teal); }
+  .month-label { font-size: 9px; font-family: 'DM Mono', monospace; color: var(--muted); text-transform: uppercase; }
+  .month-km { font-size: 9px; font-family: 'DM Mono', monospace; color: var(--muted); }
 
-  .month-label {
-    font-size: 9px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-  .month-km {
-    font-size: 9px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-  }
-
-  /* ── Activities table ── */
-  .activity-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .activity-table th {
-    text-align: left;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    padding: 0 0 12px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .activity-table td {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    vertical-align: middle;
-  }
-
+  .activity-table { width: 100%; border-collapse: collapse; }
+  .activity-table th { text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0 0 12px; border-bottom: 1px solid var(--border); }
+  .activity-table td { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
   .activity-table tr:last-child td { border-bottom: none; }
-
-  .activity-name {
-    font-weight: 500;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
+  .activity-name { font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pace-good { color: var(--green); }
   .pace-ok   { color: var(--amber); }
   .pace-hard { color: var(--red); }
 
-  /* ── HR Zones ── */
-  .zone-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
+  .zone-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .zone-label { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted); width: 72px; flex-shrink: 0; }
+  .zone-bar-bg { flex: 1; height: 10px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .zone-bar-fill { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
+  .zone-pct { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); width: 36px; text-align: right; flex-shrink: 0; }
 
-  .zone-label {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-    width: 70px;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
+  .chart-wrap { position: relative; height: 180px; }
 
-  .zone-bar-bg {
-    flex: 1;
-    height: 10px;
-    background: var(--surface2);
-    border-radius: 99px;
-    overflow: hidden;
-  }
+  .mini-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .mini-stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .mini-stat-value { font-family: 'DM Mono', monospace; font-size: 32px; font-weight: 500; line-height: 1; }
+  .mini-stat-sub { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
 
-  .zone-bar-fill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 0.6s ease;
-  }
-
-  .zone-pct {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-    width: 36px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  /* ── Chart wrap ── */
-  .chart-wrap {
-    position: relative;
-    height: 180px;
-  }
-
-  /* ── Mini stat cards ── */
-  .mini-stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .mini-stat-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
-
-  .mini-stat-value {
-    font-family: 'DM Mono', monospace;
-    font-size: 32px;
-    font-weight: 500;
-    line-height: 1;
-  }
-
-  .mini-stat-sub {
-    font-size: 11px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* ── Weekly target bars ── */
-  .target-bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-    height: 100px;
-    margin-bottom: 8px;
-  }
-
-  .target-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    flex: 1;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .target-bar {
-    width: 100%;
-    border-radius: 3px 3px 0 0;
-    min-height: 4px;
-    transition: height 0.4s ease;
-  }
-
-  .target-bar.hit     { background: var(--green); }
+  .target-bars { display: flex; align-items: flex-end; gap: 6px; height: 100px; margin-bottom: 8px; }
+  .target-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; height: 100%; justify-content: flex-end; }
+  .target-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; }
+  .target-bar.hit { background: var(--green); }
   .target-bar.partial { background: var(--amber); }
-  .target-bar.low     { background: var(--red); opacity: 0.8; }
+  .target-bar.low { background: var(--red); opacity: 0.8; }
+  .target-week-label { font-size: 9px; font-family: 'DM Mono', monospace; color: var(--muted); }
+  .target-pct-label { font-size: 9px; font-family: 'DM Mono', monospace; color: var(--muted); }
 
-  .target-week-label {
-    font-size: 9px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-  }
-
-  .target-pct-label {
-    font-size: 9px;
-    font-family: 'DM Mono', monospace;
-    color: var(--muted);
-  }
-
-  /* ── Connect overlay ── */
-  .connect-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-  }
+  .connect-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
   .connect-overlay.show { display: flex; }
-
-  .connect-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-  }
+  .connect-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px; max-width: 400px; width: 90%; text-align: center; }
   .connect-card h2 { font-size: 22px; margin-bottom: 8px; }
-  .connect-card p  { color: var(--muted); margin-bottom: 28px; font-size: 14px; line-height: 1.6; }
+  .connect-card p { color: var(--muted); margin-bottom: 28px; font-size: 14px; line-height: 1.6; }
 
-  /* ── Skeleton ── */
-  .skeleton {
-    background: var(--surface2);
-    border-radius: 8px;
-    animation: pulse 1.5s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.4; }
-  }
+  .skeleton { background: var(--surface2); border-radius: 8px; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-  /* ── Responsive ── */
-  @media (max-width: 900px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 600px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    main { padding: 16px; }
-    header { padding: 14px 16px; }
-    .activity-table { display: block; overflow-x: auto; }
-  }
+  @media (max-width: 900px) { .grid-2, .grid-4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } main { padding: 16px; } header { padding: 14px 16px; } .activity-table { display: block; overflow-x: auto; } }
 </style>
 </head>
 <body>
@@ -509,42 +119,32 @@
   <div class="header-right">
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">☀</button>
     <button class="strava-btn" id="stravaBtn" onclick="handleStravaClick()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
-      </svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
       Connect Strava
     </button>
   </div>
 </header>
 
-<!-- Connect overlay -->
 <div class="connect-overlay" id="connectOverlay">
   <div class="connect-card">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FC4C02" style="margin-bottom:16px">
-      <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
-    </svg>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FC4C02" style="margin-bottom:16px"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
     <h2>Connect to Strava</h2>
-    <p>Link your Strava account to load your live running data — activities, PRs, weekly mileage, and HR zones.</p>
+    <p>Link your Strava account to load your live running data.</p>
     <button class="strava-btn" onclick="connectStrava()" style="width:100%;justify-content:center;font-size:15px;padding:14px">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
-      </svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
       Connect with Strava
     </button>
   </div>
 </div>
 
 <main>
-
   <!-- This Week -->
   <div class="card">
     <div class="card-header">
       <span class="card-title">This Week</span>
       <span class="card-badge" id="weekBadge">Week —</span>
     </div>
-    <!-- bars only, no labels inside -->
     <div id="weekBars" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:flex-end;height:90px;margin-bottom:4px"></div>
-    <!-- day labels row, separate -->
     <div id="weekDayLabels" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:16px"></div>
     <div class="progress-labels">
       <span id="weekKmDone">— km done</span>
@@ -580,17 +180,16 @@
       </div>
       <div class="month-bars" id="monthBars"></div>
     </div>
-
     <div class="card">
       <div class="card-header">
         <span class="card-title">HR Zone Distribution</span>
         <span class="card-badge">Last 30 runs</span>
       </div>
       <div id="hrZones">
-        <div class="zone-row"><span class="zone-label mono">Z1 &lt;128</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
-        <div class="zone-row"><span class="zone-label mono">Z2 128–158</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
-        <div class="zone-row"><span class="zone-label mono">Z3 159–174</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
-        <div class="zone-row"><span class="zone-label mono">Z4 175+</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
+        <div class="zone-row"><span class="zone-label">Z1 &lt;128</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
+        <div class="zone-row"><span class="zone-label">Z2 128–158</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
+        <div class="zone-row"><span class="zone-label">Z3 159–174</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
+        <div class="zone-row"><span class="zone-label">Z4 175+</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
       </div>
       <div style="margin-top:16px;font-size:11px;color:var(--muted)">Max HR <span class="mono">183 bpm</span></div>
     </div>
@@ -604,19 +203,10 @@
     </div>
     <div style="overflow-x:auto">
       <table class="activity-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Activity</th>
-            <th>Distance</th>
-            <th>Pace</th>
-            <th>Avg HR</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Date</th><th>Activity</th><th>Distance</th><th>Pace</th><th>Avg HR</th></tr></thead>
         <tbody id="activityRows">
           <tr><td colspan="5"><div class="skeleton" style="height:14px;width:80%"></div></td></tr>
           <tr><td colspan="5"><div class="skeleton" style="height:14px;width:60%"></div></td></tr>
-          <tr><td colspan="5"><div class="skeleton" style="height:14px;width:70%"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -629,33 +219,28 @@
         <span class="card-title">Pace Trend</span>
         <span class="card-badge">Easy runs · HR &lt;150</span>
       </div>
-      <div class="chart-wrap">
-        <canvas id="paceChart"></canvas>
-      </div>
+      <div class="chart-wrap"><canvas id="paceChart"></canvas></div>
     </div>
-
     <div class="card">
       <div class="card-header">
         <span class="card-title">Avg HR Trend</span>
         <span class="card-badge">All runs · weekly</span>
       </div>
-      <div class="chart-wrap">
-        <canvas id="hrTrendChart"></canvas>
-      </div>
+      <div class="chart-wrap"><canvas id="hrTrendChart"></canvas></div>
     </div>
   </div>
 
-  <!-- Mini stats: Cadence | Streak | Days | Calories -->
+  <!-- Mini stats -->
   <div class="grid-4">
     <div class="mini-stat">
       <div class="mini-stat-label">Avg Cadence</div>
       <div class="mini-stat-value" id="cadenceVal" style="color:var(--teal)">—</div>
-      <div class="mini-stat-sub">spm · last 30 runs</div>
+      <div class="mini-stat-sub">spm · last 5 runs</div>
     </div>
     <div class="mini-stat">
       <div class="mini-stat-label">Run Streak</div>
       <div class="mini-stat-value" id="streakVal" style="color:var(--blue)">—</div>
-      <div class="mini-stat-sub" id="streakSub">consecutive days</div>
+      <div class="mini-stat-sub">consecutive days</div>
     </div>
     <div class="mini-stat">
       <div class="mini-stat-label">Days Run</div>
@@ -682,7 +267,6 @@
       <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>&lt;70%</span>
     </div>
   </div>
-
 </main>
 
 <script>
@@ -690,15 +274,11 @@
 const CLIENT_ID     = '260024';
 const CLIENT_SECRET = '00be5ed5aad6c35cb8293b67aa07a0c92012df65';
 const REDIRECT_URI  = window.location.origin + window.location.pathname;
-const MAX_HR        = 183;
 const BLOCK_START   = new Date('2026-06-22');
 const EASY_HR_MAX   = 150;
-
 const WEEKLY_TARGETS = [27,36,36,38,41,41,41,38,45,43,45,38,32,22,21];
+const ZONE_COLORS   = { Z1:'#4F8EF7', Z2:'#2DD4BF', Z3:'#FBBF24', Z4:'#F87171' };
 
-const ZONE_COLORS = { Z1:'#4F8EF7', Z2:'#2DD4BF', Z3:'#FBBF24', Z4:'#F87171' };
-
-// ── Chart instances ──────────────────────────────────────────────────────────
 let paceChartInst = null;
 let hrChartInst   = null;
 
@@ -706,10 +286,8 @@ let hrChartInst   = null;
 function getThemeColors() {
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
   return {
-    muted:   dark ? '#6B6B8A' : '#7070A0',
-    border:  dark ? '#2A2A45' : '#D1D1E0',
-    surface: dark ? '#13131F' : '#FFFFFF',
-    text:    dark ? '#E8E8F0' : '#111122',
+    muted:  dark ? '#6B6B8A' : '#7070A0',
+    border: dark ? '#2A2A45' : '#D1D1E0',
   };
 }
 
@@ -742,49 +320,39 @@ function updateChartThemes() {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getMonday(d) {
-  const day  = d.getDay();
+  const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
-  const mon  = new Date(d);
+  const mon = new Date(d);
   mon.setDate(d.getDate() + diff);
-  mon.setHours(0, 0, 0, 0);
+  mon.setHours(0,0,0,0);
   return mon;
 }
 
 function getWeekNumber() {
   const diff = new Date() - BLOCK_START;
-  if (diff < 0) return -1; // pre-block
-  const week = Math.floor(diff / (7 * 24 * 3600 * 1000));
-  return Math.min(week, WEEKLY_TARGETS.length - 1);
+  if (diff < 0) return -1;
+  return Math.min(Math.floor(diff / (7*24*3600*1000)), WEEKLY_TARGETS.length - 1);
 }
 
 function getWeekTarget() {
   const wk = getWeekNumber();
-  if (wk < 0) return 0;
-  return WEEKLY_TARGETS[wk] || 0;
+  return wk < 0 ? 0 : (WEEKLY_TARGETS[wk] || 0);
 }
 
-function fmtKm(m)  { return (m / 1000).toFixed(1); }
-function fmtDist(m){ return `${fmtKm(m)} km`; }
-
-function fmtPace(metersPerSecond) {
-  if (!metersPerSecond) return '—';
-  const secs = 1000 / metersPerSecond;
-  const m = Math.floor(secs / 60);
-  const s = Math.round(secs % 60);
-  return `${m}:${s.toString().padStart(2,'0')}`;
+function fmtPace(mps) {
+  if (!mps) return '—';
+  const s = 1000 / mps;
+  return `${Math.floor(s/60)}:${Math.round(s%60).toString().padStart(2,'0')}`;
 }
 
-function fmtDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('en-MY', { day:'numeric', month:'short' });
-}
-
-function fmtWeekLabel(isoDate) {
-  return new Date(isoDate).toLocaleDateString('en-MY', { day:'numeric', month:'short' });
-}
+function fmtDist(m)    { return `${(m/1000).toFixed(1)} km`; }
+function fmtDate(str)  { return new Date(str).toLocaleDateString('en-MY', {day:'numeric',month:'short'}); }
+function fmtWkLabel(s) { return new Date(s).toLocaleDateString('en-MY', {day:'numeric',month:'short'}); }
+function truncate(s,n) { return s.length > n ? s.slice(0,n)+'…' : s; }
 
 function paceClass(mps) {
   if (!mps) return '';
-  const s = 1000 / mps;
+  const s = 1000/mps;
   if (s >= 540) return 'pace-good';
   if (s >= 420) return 'pace-ok';
   return 'pace-hard';
@@ -797,14 +365,13 @@ function hrColor(bpm) {
   return 'pace-hard';
 }
 
-function truncate(str, n) {
-  return str.length > n ? str.slice(0, n) + '…' : str;
+function stravaIcon(sz=16) {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
 }
 
 // ── OAuth ────────────────────────────────────────────────────────────────────
 function connectStrava() {
-  const url = `https://www.strava.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=read,activity:read_all`;
-  window.location.href = url;
+  window.location.href = `https://www.strava.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=read,activity:read_all`;
 }
 
 function handleStravaClick() {
@@ -818,15 +385,11 @@ function handleStravaClick() {
   }
 }
 
-function stravaIcon(size=16) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
-}
-
 async function exchangeCode(code) {
   const res = await fetch('https://www.strava.com/oauth/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ client_id: CLIENT_ID, client_secret: CLIENT_SECRET, code, grant_type: 'authorization_code' }),
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({client_id:CLIENT_ID, client_secret:CLIENT_SECRET, code, grant_type:'authorization_code'}),
   });
   if (!res.ok) throw new Error('Token exchange failed');
   return res.json();
@@ -835,7 +398,7 @@ async function exchangeCode(code) {
 // ── Strava API ───────────────────────────────────────────────────────────────
 async function stravaGet(path, token) {
   const res = await fetch(`https://www.strava.com/api/v3${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: {Authorization: `Bearer ${token}`},
   });
   if (!res.ok) throw new Error(`Strava ${res.status}`);
   return res.json();
@@ -855,89 +418,85 @@ async function fetchAllActivities(token) {
 
 // ── Render: This Week ────────────────────────────────────────────────────────
 function renderWeek(weekRuns) {
-  const now     = new Date();
-  const monday  = getMonday(now);
-  const days    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const dayKms  = Array(7).fill(0);
+  const now    = new Date();
+  const monday = getMonday(now);
+  const days   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dayKms = Array(7).fill(0);
 
   weekRuns.forEach(r => {
-    const d   = new Date(r.start_date_local);
-    const idx = Math.floor((d - monday) / (24 * 3600 * 1000));
+    const idx = Math.floor((new Date(r.start_date_local) - monday) / (24*3600*1000));
     if (idx >= 0 && idx < 7) dayKms[idx] += r.distance;
   });
 
-  const todayIdx = (now.getDay() + 6) % 7;
-  const totalKm  = dayKms.reduce((a,b) => a + b, 0) / 1000;
+  const todayIdx = (now.getDay()+6) % 7;
+  const totalKm  = dayKms.reduce((a,b)=>a+b,0) / 1000;
   const target   = getWeekTarget();
   const weekNum  = getWeekNumber();
   const maxKm    = Math.max(...dayKms, 1);
 
-  document.getElementById('weekBadge').textContent     = weekNum < 0 ? 'Pre-Block' : `Week ${weekNum + 1}`;
-  document.getElementById('weekKmDone').textContent    = `${totalKm.toFixed(1)} km done`;
-  document.getElementById('weekTarget').textContent    = weekNum < 0 ? 'block starts 22 Jun' : `target: ${target} km`;
-  document.getElementById('weekProgressFill').style.width = (target > 0 ? Math.min(100, (totalKm / target) * 100) : 0) + '%';
+  document.getElementById('weekBadge').textContent   = weekNum < 0 ? 'Pre-Block' : `Week ${weekNum+1}`;
+  document.getElementById('weekKmDone').textContent  = `${totalKm.toFixed(1)} km done`;
+  document.getElementById('weekTarget').textContent  = weekNum < 0 ? 'block starts 22 Jun' : `target: ${target} km`;
+  document.getElementById('weekProgressFill').style.width = (target > 0 ? Math.min(100,(totalKm/target)*100) : 0) + '%';
 
   const barsEl   = document.getElementById('weekBars');
   const labelsEl = document.getElementById('weekDayLabels');
-  barsEl.innerHTML = '';
-  labelsEl.innerHTML = '';
+  barsEl.innerHTML = labelsEl.innerHTML = '';
 
   days.forEach((day, i) => {
     const km  = dayKms[i] / 1000;
-    const pct = km > 0 ? Math.max(8, (km / (maxKm / 1000)) * 90) : 10;
+    const pct = km > 0 ? Math.max(8, (km/(maxKm/1000))*90) : 10;
     barsEl.innerHTML += `
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end">
-        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted)">${km > 0 ? km.toFixed(1) : ''}</div>
-        <div class="day-bar${km === 0 ? ' empty' : ''}${i === todayIdx ? ' today' : ''}" style="width:100%;height:${pct}px;border-radius:4px 4px 0 0"></div>
+        <div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted)">${km>0?km.toFixed(1):''}</div>
+        <div class="day-bar${km===0?' empty':''}${i===todayIdx?' today':''}" style="width:100%;height:${pct}px"></div>
       </div>`;
     labelsEl.innerHTML += `<div style="text-align:center;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase">${day}</div>`;
   });
 }
 
 // ── Render: PRs ──────────────────────────────────────────────────────────────
-function renderPRs(runs) {
-  // Exclude runs with bad GPS (name contains "ngaco")
-  runs = runs.filter(r => !r.name.toLowerCase().includes('ngaco'));
+function renderPRs(allRuns) {
+  // Exclude bad GPS runs
+  const runs = allRuns.filter(r => !r.name.toLowerCase().includes('ngaco'));
+
   const prs = {
-    '1 km':         { best: 0, name: '', date: '' },
-    '5 km':         { best: 0, name: '', date: '' },
-    '10 km':        { best: 0, name: '', date: '' },
-    'Half Marathon':{ best: 0, name: '', date: '' },
-    'Longest Run':  { dist: 0, name: '', date: '' },
-    'Best Week':    { km: 0,   date: '' },
+    '1 km':         {best:0, name:'', date:''},
+    '5 km':         {best:0, name:'', date:''},
+    '10 km':        {best:0, name:'', date:''},
+    'Half Marathon':{best:0, name:'', date:''},
+    'Longest Run':  {dist:0, name:'', date:''},
+    'Best Week':    {km:0,   date:''},
   };
 
   runs.forEach(r => {
-    const km  = r.distance / 1000;
+    const km  = r.distance/1000;
     const spd = r.average_speed;
     if (spd) {
-      if (km >= 1  && spd > prs['1 km'].best)          { prs['1 km']         = { best: spd, name: r.name, date: r.start_date_local }; }
-      if (km >= 5  && spd > prs['5 km'].best)          { prs['5 km']         = { best: spd, name: r.name, date: r.start_date_local }; }
-      if (km >= 10 && spd > prs['10 km'].best)         { prs['10 km']        = { best: spd, name: r.name, date: r.start_date_local }; }
-      if (km >= 20 && spd > prs['Half Marathon'].best) { prs['Half Marathon']= { best: spd, name: r.name, date: r.start_date_local }; }
+      if (km>=1  && spd>prs['1 km'].best)          prs['1 km']          = {best:spd, name:r.name, date:r.start_date_local};
+      if (km>=5  && spd>prs['5 km'].best)          prs['5 km']          = {best:spd, name:r.name, date:r.start_date_local};
+      if (km>=10 && spd>prs['10 km'].best)         prs['10 km']         = {best:spd, name:r.name, date:r.start_date_local};
+      if (km>=20 && spd>prs['Half Marathon'].best) prs['Half Marathon'] = {best:spd, name:r.name, date:r.start_date_local};
     }
-    if (r.distance > prs['Longest Run'].dist) {
-      prs['Longest Run'] = { dist: r.distance, name: r.name, date: r.start_date_local };
-    }
+    if (r.distance > prs['Longest Run'].dist) prs['Longest Run'] = {dist:r.distance, name:r.name, date:r.start_date_local};
   });
 
-  // Best week
   const weekMap = {};
   runs.forEach(r => {
     const key = getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
-    weekMap[key] = (weekMap[key] || 0) + r.distance / 1000;
+    weekMap[key] = (weekMap[key]||0) + r.distance/1000;
   });
-  let bestWk = 0, bestWkDate = '';
-  Object.entries(weekMap).forEach(([k, v]) => { if (v > bestWk) { bestWk = v; bestWkDate = k; } });
-  prs['Best Week'] = { km: bestWk, date: bestWkDate };
+  let bestWk=0, bestWkDate='';
+  Object.entries(weekMap).forEach(([k,v]) => { if(v>bestWk){bestWk=v;bestWkDate=k;} });
+  prs['Best Week'] = {km:bestWk, date:bestWkDate};
 
   const entries = [
-    { label:'1 km',          value: prs['1 km'].best          ? fmtPace(prs['1 km'].best)          + '/km' : '—', meta: prs['1 km'].date          ? `${truncate(prs['1 km'].name,18)} · ${fmtDate(prs['1 km'].date)}`          : 'best pace' },
-    { label:'5 km',          value: prs['5 km'].best          ? fmtPace(prs['5 km'].best)          + '/km' : '—', meta: prs['5 km'].date          ? `${truncate(prs['5 km'].name,18)} · ${fmtDate(prs['5 km'].date)}`          : 'best pace' },
-    { label:'10 km',         value: prs['10 km'].best         ? fmtPace(prs['10 km'].best)         + '/km' : '—', meta: prs['10 km'].date         ? `${truncate(prs['10 km'].name,18)} · ${fmtDate(prs['10 km'].date)}`         : 'best pace' },
-    { label:'Half Marathon', value: prs['Half Marathon'].best ? fmtPace(prs['Half Marathon'].best) + '/km' : '—', meta: prs['Half Marathon'].date ? `${truncate(prs['Half Marathon'].name,18)} · ${fmtDate(prs['Half Marathon'].date)}` : 'best pace /km' },
-    { label:'Longest Run',   value: prs['Longest Run'].dist   ? (prs['Longest Run'].dist/1000).toFixed(1) + ' km' : '—', meta: prs['Longest Run'].date  ? `${truncate(prs['Longest Run'].name,18)} · ${fmtDate(prs['Longest Run'].date)}` : 'distance' },
-    { label:'Best Week',     value: bestWk                    ? bestWk.toFixed(1) + ' km' : '—',               meta: bestWkDate                  ? `w/c ${fmtDate(bestWkDate)}` : 'weekly total' },
+    {label:'1 km',          value:prs['1 km'].best          ? fmtPace(prs['1 km'].best)+'/km'          : '—', meta:prs['1 km'].date          ? `${truncate(prs['1 km'].name,18)} · ${fmtDate(prs['1 km'].date)}`          : 'best pace'},
+    {label:'5 km',          value:prs['5 km'].best          ? fmtPace(prs['5 km'].best)+'/km'          : '—', meta:prs['5 km'].date          ? `${truncate(prs['5 km'].name,18)} · ${fmtDate(prs['5 km'].date)}`          : 'best pace'},
+    {label:'10 km',         value:prs['10 km'].best         ? fmtPace(prs['10 km'].best)+'/km'         : '—', meta:prs['10 km'].date         ? `${truncate(prs['10 km'].name,18)} · ${fmtDate(prs['10 km'].date)}`         : 'best pace'},
+    {label:'Half Marathon', value:prs['Half Marathon'].best ? fmtPace(prs['Half Marathon'].best)+'/km' : '—', meta:prs['Half Marathon'].date ? `${truncate(prs['Half Marathon'].name,18)} · ${fmtDate(prs['Half Marathon'].date)}` : 'best pace'},
+    {label:'Longest Run',   value:prs['Longest Run'].dist   ? (prs['Longest Run'].dist/1000).toFixed(1)+' km' : '—', meta:prs['Longest Run'].date ? `${truncate(prs['Longest Run'].name,18)} · ${fmtDate(prs['Longest Run'].date)}` : 'distance'},
+    {label:'Best Week',     value:bestWk                    ? bestWk.toFixed(1)+' km' : '—', meta:bestWkDate ? `w/c ${fmtDate(bestWkDate)}` : 'weekly total'},
   ];
 
   document.getElementById('prGrid').innerHTML = entries.map(e => `
@@ -951,337 +510,187 @@ function renderPRs(runs) {
 // ── Render: Monthly ──────────────────────────────────────────────────────────
 function renderMonthly(runs) {
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const now    = new Date();
-  const curMon = now.getMonth();
-  const curYr  = now.getFullYear();
+  const now=new Date(), curMon=now.getMonth(), curYr=now.getFullYear();
   const monthMap = {};
-
   runs.forEach(r => {
-    const d = new Date(r.start_date_local);
-    if (d.getFullYear() !== curYr) return;
-    const m = d.getMonth();
-    monthMap[m] = (monthMap[m] || 0) + r.distance;
+    const d=new Date(r.start_date_local);
+    if(d.getFullYear()!==curYr) return;
+    const m=d.getMonth();
+    monthMap[m]=(monthMap[m]||0)+r.distance;
   });
-
-  const months = [];
-  for (let m = 0; m <= curMon; m++) months.push({ m, km: (monthMap[m] || 0) / 1000 });
-
-  const maxKm = Math.max(...months.map(x => x.km), 1);
-  document.getElementById('monthBars').innerHTML = months.map(({ m, km }) => `
+  const months=[];
+  for(let m=0;m<=curMon;m++) months.push({m,km:(monthMap[m]||0)/1000});
+  const maxKm=Math.max(...months.map(x=>x.km),1);
+  document.getElementById('monthBars').innerHTML = months.map(({m,km})=>`
     <div class="month-col">
-      <div class="month-km">${km > 0 ? km.toFixed(0) : ''}</div>
-      <div class="month-bar${m === curMon ? ' current' : ''}" style="height:${Math.max(4,(km/maxKm)*110)}px"></div>
+      <div class="month-km">${km>0?km.toFixed(0):''}</div>
+      <div class="month-bar${m===curMon?' current':''}" style="height:${Math.max(4,(km/maxKm)*110)}px"></div>
       <div class="month-label">${MONTHS[m]}</div>
     </div>`).join('');
 }
 
 // ── Render: Activities ───────────────────────────────────────────────────────
 function renderActivities(runs) {
-  const last10 = [...runs].sort((a,b) => new Date(b.start_date) - new Date(a.start_date)).slice(0,10);
-  document.getElementById('activityRows').innerHTML = last10.length
-    ? last10.map(r => `
-      <tr>
-        <td class="mono" style="color:var(--muted);white-space:nowrap">${fmtDate(r.start_date_local)}</td>
-        <td><div class="activity-name">${r.name}</div></td>
-        <td class="mono">${fmtDist(r.distance)}</td>
-        <td class="mono ${paceClass(r.average_speed)}">${fmtPace(r.average_speed)}/km</td>
-        <td class="mono">${r.average_heartrate ? `<span class="${hrColor(r.average_heartrate)}">${Math.round(r.average_heartrate)}</span>` : '—'}</td>
-      </tr>`).join('')
-    : '<tr><td colspan="5" style="color:var(--muted);padding:12px 0">No runs found.</td></tr>';
+  const last10=[...runs].sort((a,b)=>new Date(b.start_date)-new Date(a.start_date)).slice(0,10);
+  document.getElementById('activityRows').innerHTML = last10.map(r=>`
+    <tr>
+      <td class="mono" style="color:var(--muted);white-space:nowrap">${fmtDate(r.start_date_local)}</td>
+      <td><div class="activity-name">${r.name}</div></td>
+      <td class="mono">${fmtDist(r.distance)}</td>
+      <td class="mono ${paceClass(r.average_speed)}">${fmtPace(r.average_speed)}/km</td>
+      <td class="mono">${r.average_heartrate?`<span class="${hrColor(r.average_heartrate)}">${Math.round(r.average_heartrate)}</span>`:'—'}</td>
+    </tr>`).join('');
 }
 
 // ── Render: HR Zones ─────────────────────────────────────────────────────────
 function renderHRZones(runs) {
-  const last30 = [...runs]
-    .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
-    .slice(0,30)
-    .filter(r => r.average_heartrate);
-
-  const counts = { Z1:0, Z2:0, Z3:0, Z4:0 };
-  last30.forEach(r => {
-    const bpm = r.average_heartrate;
-    if      (bpm < 128) counts.Z1++;
-    else if (bpm < 159) counts.Z2++;
-    else if (bpm < 175) counts.Z3++;
-    else                counts.Z4++;
+  const last30=[...runs].sort((a,b)=>new Date(b.start_date)-new Date(a.start_date)).slice(0,30).filter(r=>r.average_heartrate);
+  const counts={Z1:0,Z2:0,Z3:0,Z4:0};
+  last30.forEach(r=>{
+    const bpm=r.average_heartrate;
+    if(bpm<128)counts.Z1++;else if(bpm<159)counts.Z2++;else if(bpm<175)counts.Z3++;else counts.Z4++;
   });
-
-  const total  = last30.length || 1;
-  const labels = { Z1:'Z1 <128', Z2:'Z2 128–158', Z3:'Z3 159–174', Z4:'Z4 175+' };
-
+  const total=last30.length||1;
+  const labels={Z1:'Z1 <128',Z2:'Z2 128–158',Z3:'Z3 159–174',Z4:'Z4 175+'};
   document.getElementById('hrZones').innerHTML =
-    ['Z1','Z2','Z3','Z4'].map(z => {
-      const pct = Math.round((counts[z] / total) * 100);
-      return `
-        <div class="zone-row">
-          <span class="zone-label">${labels[z]}</span>
-          <div class="zone-bar-bg"><div class="zone-bar-fill" style="width:${pct}%;background:${ZONE_COLORS[z]}"></div></div>
-          <span class="zone-pct">${pct}%</span>
-        </div>`;
+    ['Z1','Z2','Z3','Z4'].map(z=>{
+      const pct=Math.round((counts[z]/total)*100);
+      return `<div class="zone-row">
+        <span class="zone-label">${labels[z]}</span>
+        <div class="zone-bar-bg"><div class="zone-bar-fill" style="width:${pct}%;background:${ZONE_COLORS[z]}"></div></div>
+        <span class="zone-pct">${pct}%</span>
+      </div>`;
     }).join('') +
     `<div style="margin-top:16px;font-size:11px;color:var(--muted)">Max HR <span class="mono">183 bpm</span></div>`;
 }
 
 // ── Render: Pace Trend ───────────────────────────────────────────────────────
 function renderPaceTrend(runs) {
-  const weekMap = {};
-  runs.forEach(r => {
-    if (!r.average_heartrate || r.average_heartrate >= EASY_HR_MAX) return;
-    if (!r.average_speed) return;
-    const key = getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
-    if (!weekMap[key]) weekMap[key] = { total: 0, count: 0 };
-    weekMap[key].total += 1000 / r.average_speed; // secs per km
+  const weekMap={};
+  runs.forEach(r=>{
+    if(!r.average_heartrate||r.average_heartrate>=EASY_HR_MAX||!r.average_speed) return;
+    const key=getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
+    if(!weekMap[key])weekMap[key]={total:0,count:0};
+    weekMap[key].total+=1000/r.average_speed;
     weekMap[key].count++;
   });
+  const weeks=Object.entries(weekMap).sort(([a],[b])=>a.localeCompare(b)).slice(-12)
+    .map(([key,val])=>({label:fmtWkLabel(key),pace:val.total/val.count}));
 
-  const weeks = Object.entries(weekMap)
-    .sort(([a],[b]) => a.localeCompare(b))
-    .slice(-12)
-    .map(([key, val]) => ({ label: fmtWeekLabel(key), pace: val.total / val.count }));
-
-  if (paceChartInst) { paceChartInst.destroy(); paceChartInst = null; }
-  if (!weeks.length) {
-    document.getElementById('paceChart').parentElement.innerHTML = '<div style="color:var(--muted);font-size:12px;font-family:DM Mono,monospace;padding-top:60px;text-align:center">No easy runs found</div>';
+  if(paceChartInst){paceChartInst.destroy();paceChartInst=null;}
+  if(!weeks.length){
+    document.getElementById('paceChart').parentElement.innerHTML='<div style="color:var(--muted);font-size:12px;font-family:DM Mono,monospace;padding-top:60px;text-align:center">No easy runs found</div>';
     return;
   }
-
-  const c = getThemeColors();
-  paceChartInst = new Chart(document.getElementById('paceChart'), {
-    type: 'line',
-    data: {
-      labels: weeks.map(w => w.label),
-      datasets: [{
-        data:                weeks.map(w => w.pace),
-        borderColor:         '#2DD4BF',
-        backgroundColor:     'rgba(45,212,191,0.08)',
-        pointBackgroundColor:'#2DD4BF',
-        pointRadius:         4,
-        pointHoverRadius:    6,
-        tension:             0.35,
-        fill:                true,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const s = ctx.raw;
-              const m = Math.floor(s / 60);
-              const sec = Math.round(s % 60);
-              return ` ${m}:${sec.toString().padStart(2,'0')}/km`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid:  { color: c.border },
-          ticks: { color: c.muted, font: { family: 'DM Mono', size: 10 } },
-        },
-        y: {
-          reverse: true, // up = faster
-          grid:  { color: c.border },
-          ticks: {
-            color: c.muted,
-            font:  { family: 'DM Mono', size: 10 },
-            callback: val => {
-              const m = Math.floor(val / 60);
-              const s = Math.round(val % 60);
-              return `${m}:${s.toString().padStart(2,'0')}`;
-            }
-          }
-        }
-      }
-    }
+  const c=getThemeColors();
+  paceChartInst=new Chart(document.getElementById('paceChart'),{
+    type:'line',
+    data:{labels:weeks.map(w=>w.label),datasets:[{data:weeks.map(w=>w.pace),borderColor:'#2DD4BF',backgroundColor:'rgba(45,212,191,0.08)',pointBackgroundColor:'#2DD4BF',pointRadius:4,tension:0.35,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const s=ctx.raw;return ` ${Math.floor(s/60)}:${Math.round(s%60).toString().padStart(2,'0')}/km`;
+    }}}},scales:{x:{grid:{color:c.border},ticks:{color:c.muted,font:{family:'DM Mono',size:10}}},y:{reverse:true,grid:{color:c.border},ticks:{color:c.muted,font:{family:'DM Mono',size:10},callback:v=>`${Math.floor(v/60)}:${Math.round(v%60).toString().padStart(2,'0')}`}}}}
   });
 }
 
 // ── Render: HR Trend ─────────────────────────────────────────────────────────
 function renderHRTrend(runs) {
-  const weekMap = {};
-  runs.forEach(r => {
-    if (!r.average_heartrate) return;
-    const key = getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
-    if (!weekMap[key]) weekMap[key] = { total: 0, count: 0 };
-    weekMap[key].total += r.average_heartrate;
+  const weekMap={};
+  runs.forEach(r=>{
+    if(!r.average_heartrate) return;
+    const key=getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
+    if(!weekMap[key])weekMap[key]={total:0,count:0};
+    weekMap[key].total+=r.average_heartrate;
     weekMap[key].count++;
   });
+  const weeks=Object.entries(weekMap).sort(([a],[b])=>a.localeCompare(b)).slice(-12)
+    .map(([key,val])=>({label:fmtWkLabel(key),hr:val.total/val.count}));
 
-  const weeks = Object.entries(weekMap)
-    .sort(([a],[b]) => a.localeCompare(b))
-    .slice(-12)
-    .map(([key, val]) => ({ label: fmtWeekLabel(key), hr: val.total / val.count }));
-
-  if (hrChartInst) { hrChartInst.destroy(); hrChartInst = null; }
-  if (!weeks.length) return;
-
-  const c = getThemeColors();
-  hrChartInst = new Chart(document.getElementById('hrTrendChart'), {
-    type: 'line',
-    data: {
-      labels: weeks.map(w => w.label),
-      datasets: [{
-        data:                weeks.map(w => Math.round(w.hr)),
-        borderColor:         '#F87171',
-        backgroundColor:     'rgba(248,113,113,0.08)',
-        pointBackgroundColor:'#F87171',
-        pointRadius:         4,
-        pointHoverRadius:    6,
-        tension:             0.35,
-        fill:                true,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.raw} bpm` } }
-      },
-      scales: {
-        x: {
-          grid:  { color: c.border },
-          ticks: { color: c.muted, font: { family: 'DM Mono', size: 10 } },
-        },
-        y: {
-          grid:  { color: c.border },
-          ticks: { color: c.muted, font: { family: 'DM Mono', size: 10 }, callback: val => `${val} bpm` }
-        }
-      }
-    }
+  if(hrChartInst){hrChartInst.destroy();hrChartInst=null;}
+  if(!weeks.length) return;
+  const c=getThemeColors();
+  hrChartInst=new Chart(document.getElementById('hrTrendChart'),{
+    type:'line',
+    data:{labels:weeks.map(w=>w.label),datasets:[{data:weeks.map(w=>Math.round(w.hr)),borderColor:'#F87171',backgroundColor:'rgba(248,113,113,0.08)',pointBackgroundColor:'#F87171',pointRadius:4,tension:0.35,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.raw} bpm`}}},
+      scales:{x:{grid:{color:c.border},ticks:{color:c.muted,font:{family:'DM Mono',size:10}}},y:{grid:{color:c.border},ticks:{color:c.muted,font:{family:'DM Mono',size:10},callback:v=>`${v} bpm`}}}}
   });
 }
 
 // ── Render: Cadence ──────────────────────────────────────────────────────────
 async function renderCadence(runs, token) {
-  // Try list data first (works if watch records it)
-  const withCad = [...runs]
-    .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
-    .slice(0,10)
-    .filter(r => r.average_cadence);
-
-  if (withCad.length) {
-    const avg = withCad.reduce((a,r) => a + r.average_cadence, 0) / withCad.length;
-    document.getElementById('cadenceVal').textContent = Math.round(avg * 2);
+  const withCad=[...runs].sort((a,b)=>new Date(b.start_date)-new Date(a.start_date)).slice(0,10).filter(r=>r.average_cadence);
+  if(withCad.length){
+    const avg=withCad.reduce((a,r)=>a+r.average_cadence,0)/withCad.length;
+    document.getElementById('cadenceVal').textContent=Math.round(avg*2);
     return;
   }
-
-  // Fallback: fetch detail for last 5 runs
-  const last5 = [...runs].sort((a,b) => new Date(b.start_date) - new Date(a.start_date)).slice(0,5);
-  let total = 0, count = 0;
-  for (const run of last5) {
-    try {
-      const detail = await stravaGet(`/activities/${run.id}`, token);
-      if (detail.average_cadence) { total += detail.average_cadence; count++; }
-    } catch(e) {}
+  const last5=[...runs].sort((a,b)=>new Date(b.start_date)-new Date(a.start_date)).slice(0,5);
+  let total=0,count=0;
+  for(const run of last5){
+    try{const d=await stravaGet(`/activities/${run.id}`,token);if(d.average_cadence){total+=d.average_cadence;count++;}}catch(e){}
   }
-  document.getElementById('cadenceVal').textContent = count > 0 ? Math.round((total / count) * 2) : '—';
+  document.getElementById('cadenceVal').textContent=count>0?Math.round((total/count)*2):'—';
 }
 
 // ── Render: Streak ───────────────────────────────────────────────────────────
 function renderStreak(runs) {
-  const days = new Set(runs.map(r => r.start_date_local.slice(0,10)));
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  let streak = 0;
-  let d = new Date(today);
-
-  // If no run today, start checking from yesterday
-  const todayKey = d.toISOString().slice(0,10);
-  if (!days.has(todayKey)) d.setDate(d.getDate() - 1);
-
-  while (true) {
-    const key = d.toISOString().slice(0,10);
-    if (days.has(key)) {
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else break;
-  }
-
-  document.getElementById('streakVal').textContent = streak;
-  document.getElementById('streakSub').textContent = streak === 1 ? 'day streak' : 'day streak';
+  const days=new Set(runs.map(r=>r.start_date_local.slice(0,10)));
+  let d=new Date(); d.setHours(0,0,0,0);
+  if(!days.has(d.toISOString().slice(0,10))) d.setDate(d.getDate()-1);
+  let streak=0;
+  while(days.has(d.toISOString().slice(0,10))){streak++;d.setDate(d.getDate()-1);}
+  document.getElementById('streakVal').textContent=streak;
 }
 
 // ── Render: Days Run ─────────────────────────────────────────────────────────
 function renderDaysComparison(runs) {
-  const now       = new Date();
-  const thisMonth = now.getMonth();
-  const thisYear  = now.getFullYear();
-  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
-  const lastYear  = thisMonth === 0 ? thisYear - 1 : thisYear;
-
-  const thisSet = new Set(), lastSet = new Set();
-  runs.forEach(r => {
-    const d = new Date(r.start_date_local);
-    const key = r.start_date_local.slice(0,10);
-    if (d.getFullYear() === thisYear && d.getMonth() === thisMonth) thisSet.add(key);
-    if (d.getFullYear() === lastYear && d.getMonth() === lastMonth) lastSet.add(key);
+  const now=new Date(), thisM=now.getMonth(), thisY=now.getFullYear();
+  const lastM=thisM===0?11:thisM-1, lastY=thisM===0?thisY-1:thisY;
+  const thisSet=new Set(), lastSet=new Set();
+  runs.forEach(r=>{
+    const d=new Date(r.start_date_local), key=r.start_date_local.slice(0,10);
+    if(d.getFullYear()===thisY&&d.getMonth()===thisM) thisSet.add(key);
+    if(d.getFullYear()===lastY&&d.getMonth()===lastM) lastSet.add(key);
   });
-
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('daysVal').textContent = thisSet.size;
-  document.getElementById('daysSub').textContent = `vs ${lastSet.size} in ${MONTHS[lastMonth]}`;
+  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('daysVal').textContent=thisSet.size;
+  document.getElementById('daysSub').textContent=`vs ${lastSet.size} in ${MONTHS[lastM]}`;
 }
 
 // ── Render: Weekly Target % ──────────────────────────────────────────────────
 function renderWeeklyTargetPct(runs) {
-  const now     = new Date();
-  const results = [];
-
-  WEEKLY_TARGETS.forEach((target, i) => {
-    const weekStart = new Date(BLOCK_START);
-    weekStart.setDate(weekStart.getDate() + i * 7);
-    if (weekStart > now) return;
-
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 7);
-
-    const actual = runs
-      .filter(r => { const d = new Date(r.start_date_local); return d >= weekStart && d < weekEnd; })
-      .reduce((a,r) => a + r.distance / 1000, 0);
-
-    const pct = Math.min(110, Math.round((actual / target) * 100));
-    results.push({ week: i + 1, pct, actual: actual.toFixed(1), target });
+  const now=new Date(), results=[];
+  WEEKLY_TARGETS.forEach((target,i)=>{
+    const weekStart=new Date(BLOCK_START);
+    weekStart.setDate(weekStart.getDate()+i*7);
+    if(weekStart>now) return;
+    const weekEnd=new Date(weekStart); weekEnd.setDate(weekEnd.getDate()+7);
+    const actual=runs.filter(r=>{const d=new Date(r.start_date_local);return d>=weekStart&&d<weekEnd;}).reduce((a,r)=>a+r.distance/1000,0);
+    const pct=Math.min(110,Math.round((actual/target)*100));
+    results.push({week:i+1,pct,actual:actual.toFixed(1),target});
   });
-
-  if (!results.length) {
-    document.getElementById('targetBars').innerHTML = '<div style="color:var(--muted);font-size:12px;font-family:DM Mono,monospace">Training block starts 22 Jun 2026</div>';
+  if(!results.length){
+    document.getElementById('targetBars').innerHTML='<div style="color:var(--muted);font-size:12px;font-family:DM Mono,monospace">Training block starts 22 Jun 2026</div>';
     return;
   }
-
-  const el = document.getElementById('targetBars');
-  el.innerHTML = results.map(r => {
-    const barClass = r.pct >= 100 ? 'hit' : r.pct >= 70 ? 'partial' : 'low';
-    const barH     = Math.max(4, (r.pct / 110) * 90);
-    return `
-      <div class="target-col" title="W${r.week}: ${r.actual}km / ${r.target}km (${r.pct}%)">
-        <div class="target-pct-label">${r.pct}%</div>
-        <div class="target-bar ${barClass}" style="height:${barH}px"></div>
-        <div class="target-week-label">W${r.week}</div>
-      </div>`;
+  document.getElementById('targetBars').innerHTML=results.map(r=>{
+    const cls=r.pct>=100?'hit':r.pct>=70?'partial':'low';
+    return `<div class="target-col" title="W${r.week}: ${r.actual}km / ${r.target}km (${r.pct}%)">
+      <div class="target-pct-label">${r.pct}%</div>
+      <div class="target-bar ${cls}" style="height:${Math.max(4,(r.pct/110)*90)}px"></div>
+      <div class="target-week-label">W${r.week}</div>
+    </div>`;
   }).join('');
 }
 
 // ── Render: Calories ─────────────────────────────────────────────────────────
 async function renderCalories(weekRuns, token) {
-  // Try summary field first
-  let total = weekRuns.reduce((a,r) => a + (r.calories || r.total_calories || 0), 0);
-
-  // If zero, fetch detail for each week run (usually 1-5 runs)
-  if (total === 0 && weekRuns.length) {
-    for (const run of weekRuns) {
-      try {
-        const detail = await stravaGet(`/activities/${run.id}`, token);
-        total += detail.calories || 0;
-      } catch(e) {}
+  let total=weekRuns.reduce((a,r)=>a+(r.calories||r.total_calories||0),0);
+  if(total===0&&weekRuns.length){
+    for(const run of weekRuns){
+      try{const d=await stravaGet(`/activities/${run.id}`,token);total+=d.calories||0;}catch(e){}
     }
   }
-  document.getElementById('caloriesVal').textContent = total > 0 ? Math.round(total).toLocaleString() : '—';
+  document.getElementById('caloriesVal').textContent=total>0?Math.round(total).toLocaleString():'—';
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
@@ -1336,4 +745,14 @@ async function init() {
     if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
       sessionStorage.removeItem('strava_token');
       btn.innerHTML = stravaIcon() + ' Connect Strava';
-      btn.classList.remove('connecte
+      btn.classList.remove('connected');
+      document.getElementById('connectOverlay').classList.add('show');
+    }
+  }
+}
+
+init();
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
