@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sam's Running Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root[data-theme="dark"] {
+    --bg: #0D0D14;
+    --surface: #13131F;
+    --surface2: #1A1A2E;
+    --border: #2A2A45;
+    --text: #E8E8F0;
+    --muted: #6B6B8A;
+    --blue: #4F8EF7;
+    --teal: #2DD4BF;
+    --red: #F87171;
+    --violet: #A78BFA;
+    --amber: #FBBF24;
+    --green: #34D399;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F4F8;
+    --surface: #FFFFFF;
+    --surface2: #EEEEF6;
+    --border: #D1D1E0;
+    --text: #111122;
+    --muted: #7070A0;
+    --blue: #2563EB;
+    --teal: #0D9488;
+    --red: #DC2626;
+    --violet: #7C3AED;
+    --amber: #D97706;
+    --green: #059669;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .mono { font-family: 'DM Mono', monospace; }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .logo svg { color: var(--blue); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .theme-toggle {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .theme-toggle:hover { color: var(--text); border-color: var(--blue); }
+
+  .strava-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FC4C02;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .strava-btn:hover { opacity: 0.85; }
+  .strava-btn.connected { background: var(--green); color: #000; }
+
+  /* ── Layout ── */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: grid;
+    gap: 24px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .card-badge {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--surface2);
+    color: var(--muted);
+  }
+
+  /* ── Stat Block ── */
+  .stat-big {
+    font-family: 'DM Mono', monospace;
+    font-size: 42px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .stat-unit { font-size: 18px; font-weight: 300; color: var(--muted); margin-left: 4px; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Week bars ── */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    align-items: flex-end;
+    height: 100px;
+    margin-bottom: 8px;
+  }
+
+  .day-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .day-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    background: var(--blue);
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    min-height: 4px;
+  }
+  .day-bar.today { opacity: 1; background: var(--teal); }
+  .day-bar.empty { background: var(--border); opacity: 1; }
+
+  .day-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+  }
+
+  .day-km {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
+  .week-progress-wrap {
+    margin-top: 16px;
+  }
+
+  .progress-bar-bg {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--teal));
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── PRs ── */
+  .pr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .pr-item {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .pr-distance {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .pr-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--amber);
+  }
+
+  .pr-subvalue {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── Monthly chart ── */
+  .month-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 120px;
+    margin-bottom: 8px;
+  }
+
+  .month-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .month-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    background: var(--violet);
+    opacity: 0.7;
+    min-height: 4px;
+  }
+  .month-bar.current { opacity: 1; background: var(--teal); }
+
+  .month-label {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .month-km {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
+  /* ── Activities table ── */
+  .activity-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .activity-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .activity-table td {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .activity-table tr:last-child td { border-bottom: none; }
+
+  .activity-table .mono {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .activity-name {
+    font-weight: 500;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pace-good { color: var(--green); }
+  .pace-ok { color: var(--amber); }
+  .pace-hard { color: var(--red); }
+
+  /* ── HR Zones ── */
+  .zone-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .zone-label {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    width: 28px;
+    flex-shrink: 0;
+  }
+
+  .zone-bar-bg {
+    flex: 1;
+    height: 10px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .zone-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+
+  .zone-pct {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── Connect overlay ── */
+  .connect-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .connect-overlay.show { display: flex; }
+
+  .connect-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+  }
+
+  .connect-card h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .connect-card p {
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Loading skeleton ── */
+  .skeleton {
+    background: var(--surface2);
+    border-radius: 8px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .skeleton-text { height: 14px; width: 60%; }
+  .skeleton-big { height: 48px; width: 120px; margin-bottom: 8px; }
+
+  /* ── Error state ── */
+  .error-msg {
+    color: var(--red);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    padding: 8px 12px;
+    background: rgba(248,113,113,0.1);
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    main { padding: 16px; }
+    header { padding: 14px 16px; }
+    .stat-big { font-size: 32px; }
+    .activity-table { display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+    </svg>
+    Sam's Running
+  </div>
+  <div class="header-right">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">☀</button>
+    <button class="strava-btn" id="stravaBtn" onclick="handleStravaClick()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+      </svg>
+      Connect Strava
+    </button>
+  </div>
+</header>
+
+<!-- Connect overlay (shown on first load if no token) -->
+<div class="connect-overlay" id="connectOverlay">
+  <div class="connect-card">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="#FC4C02" style="margin-bottom:16px">
+      <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+    </svg>
+    <h2>Connect to Strava</h2>
+    <p>Link your Strava account to load your live running data — activities, PRs, weekly mileage, and HR zones.</p>
+    <button class="strava-btn" onclick="connectStrava()" style="width:100%;justify-content:center;font-size:15px;padding:14px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+      </svg>
+      Connect with Strava
+    </button>
+  </div>
+</div>
+
+<main>
+
+  <!-- Row 1: This Week + Weekly Target -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">This Week</span>
+      <span class="card-badge" id="weekBadge">Week —</span>
+    </div>
+    <div class="week-grid" id="weekBars">
+      <!-- filled by JS -->
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px" id="weekDayLabels">
+      <!-- filled by JS -->
+    </div>
+    <div class="week-progress-wrap">
+      <div class="progress-labels">
+        <span id="weekKmDone">— km done</span>
+        <span id="weekTarget">target: — km</span>
+      </div>
+      <div class="progress-bar-bg" style="margin-top:8px">
+        <div class="progress-bar-fill" id="weekProgressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: PRs -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Personal Records</span>
+      <span class="card-badge">All Time</span>
+    </div>
+    <div class="pr-grid" id="prGrid">
+      <div class="pr-item skeleton" style="height:72px"></div>
+      <div class="pr-item skeleton" style="height:72px"></div>
+      <div class="pr-item skeleton" style="height:72px"></div>
+      <div class="pr-item skeleton" style="height:72px"></div>
+      <div class="pr-item skeleton" style="height:72px"></div>
+      <div class="pr-item skeleton" style="height:72px"></div>
+    </div>
+  </div>
+
+  <!-- Row 3: Monthly Mileage + HR Zones -->
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Monthly Mileage</span>
+        <span class="card-badge">2026</span>
+      </div>
+      <div class="month-bars" id="monthBars">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">HR Zone Distribution</span>
+        <span class="card-badge">Last 30 runs</span>
+      </div>
+      <div id="hrZones">
+        <div class="zone-row">
+          <span class="zone-label">Z1</span>
+          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
+          <span class="zone-pct">—</span>
+        </div>
+        <div class="zone-row">
+          <span class="zone-label">Z2</span>
+          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
+          <span class="zone-pct">—</span>
+        </div>
+        <div class="zone-row">
+          <span class="zone-label">Z3</span>
+          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
+          <span class="zone-pct">—</span>
+        </div>
+        <div class="zone-row">
+          <span class="zone-label">Z4</span>
+          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
+          <span class="zone-pct">—</span>
+        </div>
+      </div>
+      <div style="margin-top:16px;font-size:11px;color:var(--muted)">
+        Based on max HR <span class="mono">183 bpm</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Row 4: Recent Activities -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Recent Activities</span>
+      <span class="card-badge">Last 10</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Activity</th>
+            <th>Distance</th>
+            <th>Pace</th>
+            <th>Avg HR</th>
+          </tr>
+        </thead>
+        <tbody id="activityRows">
+          <tr><td colspan="5"><div class="skeleton skeleton-text"></div></td></tr>
+          <tr><td colspan="5"><div class="skeleton skeleton-text"></div></td></tr>
+          <tr><td colspan="5"><div class="skeleton skeleton-text"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const CLIENT_ID     = '260024';
+const CLIENT_SECRET = '00be5ed5aad6c35cb8293b67aa07a0c92012df65';
+const REDIRECT_URI  = window.location.origin + window.location.pathname;
+const MAX_HR        = 183;
+const BLOCK_START   = new Date('2026-06-22');
+
+const WEEKLY_TARGETS = [27,36,36,38,41,41,41,38,45,43,45,38,32,22,21];
+
+const ZONE_COLORS = {
+  Z1: '#4F8EF7',   // blue
+  Z2: '#2DD4BF',   // teal
+  Z3: '#FBBF24',   // amber
+  Z4: '#F87171',   // red
+};
+
+const ZONE_BOUNDS = [
+  { name:'Z1', min: 0,   max: 127 },
+  { name:'Z2', min: 128, max: 158 },
+  { name:'Z3', min: 159, max: 174 },
+  { name:'Z4', min: 175, max: 999 },
+];
+
+// ── Theme ───────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀' : '🌙';
+  localStorage.setItem('theme', next);
+}
+(function initTheme() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀' : '🌙';
+})();
+
+// ── Training week ────────────────────────────────────────────────────────────
+function getWeekNumber() {
+  const now   = new Date();
+  const diff  = now - BLOCK_START;
+  const week  = Math.floor(diff / (7 * 24 * 3600 * 1000));
+  return Math.max(0, Math.min(week, WEEKLY_TARGETS.length - 1));
+}
+
+function getWeekTarget() {
+  return WEEKLY_TARGETS[getWeekNumber()] || 0;
+}
+
+function getMonday(d) {
+  const day = d.getDay(); // 0=Sun
+  const diff = (day === 0) ? -6 : 1 - day;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + diff);
+  monday.setHours(0,0,0,0);
+  return monday;
+}
+
+// ── OAuth ────────────────────────────────────────────────────────────────────
+function connectStrava() {
+  const scope = 'read,activity:read_all';
+  const url   = `https://www.strava.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
+  window.location.href = url;
+}
+
+function handleStravaClick() {
+  const token = sessionStorage.getItem('strava_token');
+  if (token) {
+    sessionStorage.removeItem('strava_token');
+    sessionStorage.removeItem('strava_athlete');
+    document.getElementById('stravaBtn').textContent = 'Connect Strava';
+    document.getElementById('stravaBtn').classList.remove('connected');
+    document.getElementById('connectOverlay').classList.add('show');
+  } else {
+    connectStrava();
+  }
+}
+
+async function exchangeCode(code) {
+  const res = await fetch('https://www.strava.com/oauth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id:     CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code,
+      grant_type:    'authorization_code',
+    }),
+  });
+  if (!res.ok) throw new Error('Token exchange failed');
+  return res.json();
+}
+
+// ── Strava API ───────────────────────────────────────────────────────────────
+async function stravaGet(path, token) {
+  const res = await fetch(`https://www.strava.com/api/v3${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Strava API error: ${res.status}`);
+  return res.json();
+}
+
+async function fetchAllActivities(token) {
+  let page = 1, all = [];
+  while (true) {
+    const batch = await stravaGet(`/athlete/activities?per_page=200&page=${page}`, token);
+    if (!batch.length) break;
+    all = all.concat(batch);
+    if (batch.length < 200) break;
+    page++;
+  }
+  return all.filter(a => a.type === 'Run' || a.sport_type === 'Run');
+}
+
+// ── Formatting ───────────────────────────────────────────────────────────────
+function fmtKm(m)   { return (m / 1000).toFixed(1); }
+function fmtDist(m) { return `${fmtKm(m)} km`; }
+
+function fmtPace(metersPerSecond) {
+  if (!metersPerSecond || metersPerSecond === 0) return '—';
+  const secsPerKm = 1000 / metersPerSecond;
+  const mins = Math.floor(secsPerKm / 60);
+  const secs = Math.round(secsPerKm % 60);
+  return `${mins}:${secs.toString().padStart(2,'0')}`;
+}
+
+function fmtTime(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function fmtDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-MY', { day:'numeric', month:'short' });
+}
+
+function paceClass(metersPerSecond) {
+  if (!metersPerSecond) return '';
+  const secsPerKm = 1000 / metersPerSecond;
+  if (secsPerKm >= 540) return 'pace-good';  // ≥9:00/km = easy
+  if (secsPerKm >= 420) return 'pace-ok';    // 7–9 min
+  return 'pace-hard';
+}
+
+// ── Dashboard render ──────────────────────────────────────────────────────────
+function renderWeek(runs) {
+  const now    = new Date();
+  const monday = getMonday(now);
+  const days   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dayKms = Array(7).fill(0);
+
+  runs.forEach(r => {
+    const d = new Date(r.start_date_local);
+    const dayIdx = Math.floor((d - monday) / (24*3600*1000));
+    if (dayIdx >= 0 && dayIdx < 7) dayKms[dayIdx] += r.distance;
+  });
+
+  const todayIdx = ((now.getDay() + 6) % 7); // 0=Mon
+  const totalKm  = dayKms.reduce((a,b) => a+b, 0) / 1000;
+  const target   = getWeekTarget();
+  const weekNum  = getWeekNumber() + 1;
+  const maxKm    = Math.max(...dayKms, 1);
+
+  document.getElementById('weekBadge').textContent = `Week ${weekNum}`;
+  document.getElementById('weekKmDone').textContent = `${totalKm.toFixed(1)} km done`;
+  document.getElementById('weekTarget').textContent  = `target: ${target} km`;
+  document.getElementById('weekProgressFill').style.width = Math.min(100, (totalKm/target)*100) + '%';
+
+  const barsEl = document.getElementById('weekBars');
+  barsEl.innerHTML = '';
+  days.forEach((day, i) => {
+    const km   = dayKms[i] / 1000;
+    const pct  = km > 0 ? Math.max(8, (km / (maxKm/1000)) * 100) : 0;
+    const wrap = document.createElement('div');
+    wrap.className = 'day-bar-wrap';
+
+    const kmLabel = document.createElement('div');
+    kmLabel.className = 'day-km';
+    kmLabel.textContent = km > 0 ? km.toFixed(1) : '';
+
+    const bar  = document.createElement('div');
+    bar.className = 'day-bar' + (km === 0 ? ' empty' : '') + (i === todayIdx ? ' today' : '');
+    bar.style.height = (km > 0 ? pct : 10) + 'px';
+
+    const label = document.createElement('div');
+    label.className = 'day-label';
+    label.textContent = day;
+
+    wrap.appendChild(kmLabel);
+    wrap.appendChild(bar);
+    wrap.appendChild(label);
+    barsEl.appendChild(wrap);
+  });
+}
+
+function renderPRs(runs) {
+  const prs = {
+    '1 km':        { best: 0, unit: '/km', isTime: false, bestDist: 0 },
+    '5 km':        { best: 0, unit: '/km', isTime: false, bestDist: 0 },
+    '10 km':       { best: 0, unit: '/km', isTime: false, bestDist: 0 },
+    'Half Marathon':{ best: 0, unit: '/km', isTime: false, bestDist: 0 },
+    'Longest Run': { best: 0, dist: 0 },
+    'Best Week':   { best: 0 },
+  };
+
+  // Pace PRs (fastest speed = highest m/s)
+  runs.forEach(r => {
+    const km   = r.distance / 1000;
+    const spd  = r.average_speed;
+    if (!spd) return;
+
+    if (km >= 1)    { if (spd > prs['1 km'].best)         prs['1 km'].best         = spd; }
+    if (km >= 5)    { if (spd > prs['5 km'].best)         prs['5 km'].best         = spd; }
+    if (km >= 10)   { if (spd > prs['10 km'].best)        prs['10 km'].best        = spd; }
+    if (km >= 20)   { if (spd > prs['Half Marathon'].best) prs['Half Marathon'].best = spd; }
+    if (r.distance > prs['Longest Run'].dist) prs['Longest Run'].dist = r.distance;
+  });
+
+  // Best week
+  const weekMap = {};
+  runs.forEach(r => {
+    const d      = new Date(r.start_date_local);
+    const monday = getMonday(d);
+    const key    = monday.toISOString().slice(0,10);
+    weekMap[key] = (weekMap[key] || 0) + r.distance;
+  });
+  const bestWeekKm = Math.max(0, ...Object.values(weekMap)) / 1000;
+  prs['Longest Run'].km = prs['Longest Run'].dist / 1000;
+  prs['Best Week'].km   = bestWeekKm;
+
+  const grid = document.getElementById('prGrid');
+  const entries = [
+    { label:'1 km',         value: prs['1 km'].best         ? fmtPace(prs['1 km'].best)         : '—', sub: 'best pace' },
+    { label:'5 km',         value: prs['5 km'].best         ? fmtPace(prs['5 km'].best)          : '—', sub: 'best pace' },
+    { label:'10 km',        value: prs['10 km'].best        ? fmtPace(prs['10 km'].best)         : '—', sub: 'best pace' },
+    { label:'Half Marathon',value: prs['Half Marathon'].best ? fmtPace(prs['Half Marathon'].best) : '—', sub: 'best pace /km' },
+    { label:'Longest Run',  value: prs['Longest Run'].km    ? prs['Longest Run'].km.toFixed(1) + ' km' : '—', sub: 'distance' },
+    { label:'Best Week',    value: bestWeekKm               ? bestWeekKm.toFixed(1) + ' km'             : '—', sub: 'weekly total' },
+  ];
+
+  grid.innerHTML = entries.map(e => `
+    <div class="pr-item">
+      <div class="pr-distance">${e.label}</div>
+      <div class="pr-value mono">${e.value}</div>
+      <div class="pr-subvalue">${e.sub}</div>
+    </div>
+  `).join('');
+}
+
+function renderMonthly(runs) {
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const now    = new Date();
+  const curMon = now.getMonth();
+  const curYr  = now.getFullYear();
+
+  // Only 2026 months up to current
+  const monthMap = {};
+  runs.forEach(r => {
+    const d = new Date(r.start_date_local);
+    if (d.getFullYear() !== curYr) return;
+    const m = d.getMonth();
+    monthMap[m] = (monthMap[m] || 0) + r.distance;
+  });
+
+  const months = [];
+  for (let m = 0; m <= curMon; m++) {
+    months.push({ m, km: (monthMap[m] || 0) / 1000 });
+  }
+
+  const maxKm = Math.max(...months.map(x=>x.km), 1);
+
+  const barsEl = document.getElementById('monthBars');
+  barsEl.innerHTML = months.map(({ m, km }) => `
+    <div class="month-col">
+      <div class="month-km">${km > 0 ? km.toFixed(0) : ''}</div>
+      <div class="month-bar${m === curMon ? ' current' : ''}" style="height:${Math.max(4,(km/maxKm)*110)}px"></div>
+      <div class="month-label">${MONTHS[m]}</div>
+    </div>
+  `).join('');
+}
+
+function renderActivities(runs) {
+  const last10 = runs
+    .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
+    .slice(0, 10);
+
+  const tbody = document.getElementById('activityRows');
+  if (!last10.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);padding:12px 0">No runs found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = last10.map(r => {
+    const hr  = r.average_heartrate ? `<span class="${hrColor(r.average_heartrate)}">${Math.round(r.average_heartrate)}</span>` : '—';
+    return `
+      <tr>
+        <td class="mono" style="color:var(--muted);white-space:nowrap">${fmtDate(r.start_date_local)}</td>
+        <td><div class="activity-name">${r.name}</div></td>
+        <td class="mono">${fmtDist(r.distance)}</td>
+        <td class="mono ${paceClass(r.average_speed)}">${fmtPace(r.average_speed)}/km</td>
+        <td class="mono">${hr}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function hrColor(bpm) {
+  if (bpm < 128) return 'pace-good';
+  if (bpm < 159) return '';
+  if (bpm < 175) return 'pace-ok';
+  return 'pace-hard';
+}
+
+function renderHRZones(runs) {
+  const last30 = runs
+    .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
+    .slice(0, 30)
+    .filter(r => r.average_heartrate);
+
+  const counts = { Z1:0, Z2:0, Z3:0, Z4:0 };
+  last30.forEach(r => {
+    const bpm = r.average_heartrate;
+    if      (bpm < 128) counts.Z1++;
+    else if (bpm < 159) counts.Z2++;
+    else if (bpm < 175) counts.Z3++;
+    else                counts.Z4++;
+  });
+
+  const total = last30.length || 1;
+  const zonesEl = document.getElementById('hrZones');
+  zonesEl.innerHTML = ['Z1','Z2','Z3','Z4'].map(z => {
+    const pct = Math.round((counts[z] / total) * 100);
+    const ranges = { Z1:'<128 bpm', Z2:'128–158', Z3:'159–174', Z4:'175+' };
+    return `
+      <div class="zone-row" title="${ranges[z]}">
+        <span class="zone-label">${z}</span>
+        <div class="zone-bar-bg">
+          <div class="zone-bar-fill" style="width:${pct}%;background:${ZONE_COLORS[z]}"></div>
+        </div>
+        <span class="zone-pct">${pct}%</span>
+      </div>
+    `;
+  }).join('') + `<div style="margin-top:16px;font-size:11px;color:var(--muted)">Based on max HR <span class="mono">183 bpm</span></div>`;
+}
+
+// ── Main init ────────────────────────────────────────────────────────────────
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const code   = params.get('code');
+  let token    = sessionStorage.getItem('strava_token');
+
+  // Clear code from URL
+  if (code) {
+    window.history.replaceState({}, '', window.location.pathname);
+    try {
+      const data = await exchangeCode(code);
+      token = data.access_token;
+      sessionStorage.setItem('strava_token', token);
+      sessionStorage.setItem('strava_athlete', JSON.stringify(data.athlete));
+    } catch(e) {
+      console.error(e);
+      document.getElementById('connectOverlay').classList.add('show');
+      return;
+    }
+  }
+
+  if (!token) {
+    document.getElementById('connectOverlay').classList.add('show');
+    return;
+  }
+
+  // Show connected state
+  const btn = document.getElementById('stravaBtn');
+  btn.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
+    </svg>
+    Connected ✓
+  `;
+  btn.classList.add('connected');
+  document.getElementById('connectOverlay').classList.remove('show');
+
+  // Fetch and render
+  try {
+    const runs = await fetchAllActivities(token);
+
+    // Get this week's runs
+    const monday = getMonday(new Date());
+    const weekRuns = runs.filter(r => new Date(r.start_date_local) >= monday);
+
+    renderWeek(weekRuns);
+    renderPRs(runs);
+    renderMonthly(runs);
+    renderActivities(runs);
+    renderHRZones(runs);
+
+  } catch(e) {
+    console.error(e);
+    // Token might be expired
+    if (e.message.includes('401') || e.message.includes('403')) {
+      sessionStorage.removeItem('strava_token');
+      document.getElementById('connectOverlay').classList.add('show');
+      btn.textContent = 'Connect Strava';
+      btn.classList.remove('connected');
+    }
+  }
+}
+
+init();
+</script>
+</body>
+</html>
