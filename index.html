@@ -6,7 +6,8 @@
 <title>Sam's Running Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root[data-theme="dark"] {
     --bg: #0D0D14;
@@ -42,7 +43,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.5;
     min-height: 100vh;
@@ -70,14 +71,9 @@
     font-weight: 600;
     font-size: 16px;
   }
-
   .logo svg { color: var(--blue); }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .header-right { display: flex; align-items: center; gap: 12px; }
 
   .theme-toggle {
     background: var(--surface2);
@@ -103,7 +99,7 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     transition: opacity 0.2s;
   }
   .strava-btn:hover { opacity: 0.85; }
@@ -120,6 +116,7 @@
 
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 24px; }
 
   /* ── Cards ── */
   .card {
@@ -152,16 +149,6 @@
     background: var(--surface2);
     color: var(--muted);
   }
-
-  /* ── Stat Block ── */
-  .stat-big {
-    font-family: 'DM Mono', monospace;
-    font-size: 42px;
-    font-weight: 500;
-    line-height: 1;
-  }
-  .stat-unit { font-size: 18px; font-weight: 300; color: var(--muted); margin-left: 4px; }
-  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
   /* ── Week bars ── */
   .week-grid {
@@ -199,15 +186,10 @@
     font-family: 'DM Mono', monospace;
     text-transform: uppercase;
   }
-
   .day-km {
     font-size: 10px;
     font-family: 'DM Mono', monospace;
     color: var(--muted);
-  }
-
-  .week-progress-wrap {
-    margin-top: 16px;
   }
 
   .progress-bar-bg {
@@ -215,7 +197,7 @@
     background: var(--surface2);
     border-radius: 99px;
     overflow: hidden;
-    margin-top: 6px;
+    margin-top: 8px;
   }
   .progress-bar-fill {
     height: 100%;
@@ -262,9 +244,12 @@
 
   .pr-subvalue {
     font-family: 'DM Mono', monospace;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ── Monthly chart ── */
@@ -301,7 +286,6 @@
     color: var(--muted);
     text-transform: uppercase;
   }
-
   .month-km {
     font-size: 9px;
     font-family: 'DM Mono', monospace;
@@ -334,11 +318,6 @@
 
   .activity-table tr:last-child td { border-bottom: none; }
 
-  .activity-table .mono {
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-  }
-
   .activity-name {
     font-weight: 500;
     max-width: 200px;
@@ -348,7 +327,7 @@
   }
 
   .pace-good { color: var(--green); }
-  .pace-ok { color: var(--amber); }
+  .pace-ok   { color: var(--amber); }
   .pace-hard { color: var(--red); }
 
   /* ── HR Zones ── */
@@ -360,11 +339,12 @@
   }
 
   .zone-label {
-    font-size: 11px;
+    font-size: 10px;
     font-family: 'DM Mono', monospace;
     color: var(--muted);
-    width: 28px;
+    width: 70px;
     flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .zone-bar-bg {
@@ -390,6 +370,86 @@
     flex-shrink: 0;
   }
 
+  /* ── Chart wrap ── */
+  .chart-wrap {
+    position: relative;
+    height: 180px;
+  }
+
+  /* ── Mini stat cards ── */
+  .mini-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mini-stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .mini-stat-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .mini-stat-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── Weekly target bars ── */
+  .target-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 100px;
+    margin-bottom: 8px;
+  }
+
+  .target-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .target-bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    min-height: 4px;
+    transition: height 0.4s ease;
+  }
+
+  .target-bar.hit     { background: var(--green); }
+  .target-bar.partial { background: var(--amber); }
+  .target-bar.low     { background: var(--red); opacity: 0.8; }
+
+  .target-week-label {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
+  .target-pct-label {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
   /* ── Connect overlay ── */
   .connect-overlay {
     display: none;
@@ -411,20 +471,10 @@
     width: 90%;
     text-align: center;
   }
+  .connect-card h2 { font-size: 22px; margin-bottom: 8px; }
+  .connect-card p  { color: var(--muted); margin-bottom: 28px; font-size: 14px; line-height: 1.6; }
 
-  .connect-card h2 {
-    font-size: 22px;
-    margin-bottom: 8px;
-  }
-
-  .connect-card p {
-    color: var(--muted);
-    margin-bottom: 28px;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  /* ── Loading skeleton ── */
+  /* ── Skeleton ── */
   .skeleton {
     background: var(--surface2);
     border-radius: 8px;
@@ -432,29 +482,17 @@
   }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  .skeleton-text { height: 14px; width: 60%; }
-  .skeleton-big { height: 48px; width: 120px; margin-bottom: 8px; }
-
-  /* ── Error state ── */
-  .error-msg {
-    color: var(--red);
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-    padding: 8px 12px;
-    background: rgba(248,113,113,0.1);
-    border-radius: 8px;
-    margin-top: 8px;
+    50%       { opacity: 0.4; }
   }
 
   /* ── Responsive ── */
-  @media (max-width: 768px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
     main { padding: 16px; }
     header { padding: 14px 16px; }
-    .stat-big { font-size: 32px; }
     .activity-table { display: block; overflow-x: auto; }
   }
 </style>
@@ -479,7 +517,7 @@
   </div>
 </header>
 
-<!-- Connect overlay (shown on first load if no token) -->
+<!-- Connect overlay -->
 <div class="connect-overlay" id="connectOverlay">
   <div class="connect-card">
     <svg width="48" height="48" viewBox="0 0 24 24" fill="#FC4C02" style="margin-bottom:16px">
@@ -498,56 +536,46 @@
 
 <main>
 
-  <!-- Row 1: This Week + Weekly Target -->
+  <!-- This Week -->
   <div class="card">
     <div class="card-header">
       <span class="card-title">This Week</span>
       <span class="card-badge" id="weekBadge">Week —</span>
     </div>
-    <div class="week-grid" id="weekBars">
-      <!-- filled by JS -->
+    <div class="week-grid" id="weekBars"></div>
+    <div class="progress-labels" style="margin-top:16px">
+      <span id="weekKmDone">— km done</span>
+      <span id="weekTarget">target: — km</span>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:16px" id="weekDayLabels">
-      <!-- filled by JS -->
-    </div>
-    <div class="week-progress-wrap">
-      <div class="progress-labels">
-        <span id="weekKmDone">— km done</span>
-        <span id="weekTarget">target: — km</span>
-      </div>
-      <div class="progress-bar-bg" style="margin-top:8px">
-        <div class="progress-bar-fill" id="weekProgressFill" style="width:0%"></div>
-      </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="weekProgressFill" style="width:0%"></div>
     </div>
   </div>
 
-  <!-- Row 2: PRs -->
+  <!-- Personal Records -->
   <div class="card">
     <div class="card-header">
       <span class="card-title">Personal Records</span>
       <span class="card-badge">All Time</span>
     </div>
     <div class="pr-grid" id="prGrid">
-      <div class="pr-item skeleton" style="height:72px"></div>
-      <div class="pr-item skeleton" style="height:72px"></div>
-      <div class="pr-item skeleton" style="height:72px"></div>
-      <div class="pr-item skeleton" style="height:72px"></div>
-      <div class="pr-item skeleton" style="height:72px"></div>
-      <div class="pr-item skeleton" style="height:72px"></div>
+      <div class="pr-item skeleton" style="height:80px"></div>
+      <div class="pr-item skeleton" style="height:80px"></div>
+      <div class="pr-item skeleton" style="height:80px"></div>
+      <div class="pr-item skeleton" style="height:80px"></div>
+      <div class="pr-item skeleton" style="height:80px"></div>
+      <div class="pr-item skeleton" style="height:80px"></div>
     </div>
   </div>
 
-  <!-- Row 3: Monthly Mileage + HR Zones -->
+  <!-- Monthly + HR Zones -->
   <div class="grid-2">
-
     <div class="card">
       <div class="card-header">
         <span class="card-title">Monthly Mileage</span>
         <span class="card-badge">2026</span>
       </div>
-      <div class="month-bars" id="monthBars">
-        <!-- filled by JS -->
-      </div>
+      <div class="month-bars" id="monthBars"></div>
     </div>
 
     <div class="card">
@@ -556,35 +584,16 @@
         <span class="card-badge">Last 30 runs</span>
       </div>
       <div id="hrZones">
-        <div class="zone-row">
-          <span class="zone-label">Z1</span>
-          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
-          <span class="zone-pct">—</span>
-        </div>
-        <div class="zone-row">
-          <span class="zone-label">Z2</span>
-          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
-          <span class="zone-pct">—</span>
-        </div>
-        <div class="zone-row">
-          <span class="zone-label">Z3</span>
-          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
-          <span class="zone-pct">—</span>
-        </div>
-        <div class="zone-row">
-          <span class="zone-label">Z4</span>
-          <div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div>
-          <span class="zone-pct">—</span>
-        </div>
+        <div class="zone-row"><span class="zone-label mono">Z1 &lt;128</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
+        <div class="zone-row"><span class="zone-label mono">Z2 128–158</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
+        <div class="zone-row"><span class="zone-label mono">Z3 159–174</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
+        <div class="zone-row"><span class="zone-label mono">Z4 175+</span><div class="zone-bar-bg"><div class="zone-bar-fill skeleton" style="width:100%;height:100%"></div></div><span class="zone-pct">—</span></div>
       </div>
-      <div style="margin-top:16px;font-size:11px;color:var(--muted)">
-        Based on max HR <span class="mono">183 bpm</span>
-      </div>
+      <div style="margin-top:16px;font-size:11px;color:var(--muted)">Max HR <span class="mono">183 bpm</span></div>
     </div>
-
   </div>
 
-  <!-- Row 4: Recent Activities -->
+  <!-- Recent Activities -->
   <div class="card">
     <div class="card-header">
       <span class="card-title">Recent Activities</span>
@@ -602,88 +611,198 @@
           </tr>
         </thead>
         <tbody id="activityRows">
-          <tr><td colspan="5"><div class="skeleton skeleton-text"></div></td></tr>
-          <tr><td colspan="5"><div class="skeleton skeleton-text"></div></td></tr>
-          <tr><td colspan="5"><div class="skeleton skeleton-text"></div></td></tr>
+          <tr><td colspan="5"><div class="skeleton" style="height:14px;width:80%"></div></td></tr>
+          <tr><td colspan="5"><div class="skeleton" style="height:14px;width:60%"></div></td></tr>
+          <tr><td colspan="5"><div class="skeleton" style="height:14px;width:70%"></div></td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Pace Trend + HR Trend -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Pace Trend</span>
+        <span class="card-badge">Easy runs · HR &lt;150</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="paceChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Avg HR Trend</span>
+        <span class="card-badge">All runs · weekly</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="hrTrendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini stats: Cadence | Streak | Days | Calories -->
+  <div class="grid-4">
+    <div class="mini-stat">
+      <div class="mini-stat-label">Avg Cadence</div>
+      <div class="mini-stat-value" id="cadenceVal" style="color:var(--teal)">—</div>
+      <div class="mini-stat-sub">spm · last 30 runs</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-label">Run Streak</div>
+      <div class="mini-stat-value" id="streakVal" style="color:var(--blue)">—</div>
+      <div class="mini-stat-sub" id="streakSub">consecutive days</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-label">Days Run</div>
+      <div class="mini-stat-value" id="daysVal" style="color:var(--violet)">—</div>
+      <div class="mini-stat-sub" id="daysSub">this vs last month</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-label">Calories</div>
+      <div class="mini-stat-value" id="caloriesVal" style="color:var(--amber)">—</div>
+      <div class="mini-stat-sub">kcal this week</div>
+    </div>
+  </div>
+
+  <!-- Weekly Target % -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Weekly Target Progress</span>
+      <span class="card-badge">16-week block</span>
+    </div>
+    <div class="target-bars" id="targetBars"></div>
+    <div style="display:flex;gap:20px;font-size:11px;color:var(--muted);margin-top:4px">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>≥100%</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:var(--amber);display:inline-block"></span>70–99%</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>&lt;70%</span>
     </div>
   </div>
 
 </main>
 
 <script>
-// ── Config ──────────────────────────────────────────────────────────────────
+// ── Config ───────────────────────────────────────────────────────────────────
 const CLIENT_ID     = '260024';
 const CLIENT_SECRET = '00be5ed5aad6c35cb8293b67aa07a0c92012df65';
 const REDIRECT_URI  = window.location.origin + window.location.pathname;
 const MAX_HR        = 183;
 const BLOCK_START   = new Date('2026-06-22');
+const EASY_HR_MAX   = 150;
 
 const WEEKLY_TARGETS = [27,36,36,38,41,41,41,38,45,43,45,38,32,22,21];
 
-const ZONE_COLORS = {
-  Z1: '#4F8EF7',   // blue
-  Z2: '#2DD4BF',   // teal
-  Z3: '#FBBF24',   // amber
-  Z4: '#F87171',   // red
-};
+const ZONE_COLORS = { Z1:'#4F8EF7', Z2:'#2DD4BF', Z3:'#FBBF24', Z4:'#F87171' };
 
-const ZONE_BOUNDS = [
-  { name:'Z1', min: 0,   max: 127 },
-  { name:'Z2', min: 128, max: 158 },
-  { name:'Z3', min: 159, max: 174 },
-  { name:'Z4', min: 175, max: 999 },
-];
+// ── Chart instances ──────────────────────────────────────────────────────────
+let paceChartInst = null;
+let hrChartInst   = null;
 
-// ── Theme ───────────────────────────────────────────────────────────────────
+// ── Theme ────────────────────────────────────────────────────────────────────
+function getThemeColors() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  return {
+    muted:   dark ? '#6B6B8A' : '#7070A0',
+    border:  dark ? '#2A2A45' : '#D1D1E0',
+    surface: dark ? '#13131F' : '#FFFFFF',
+    text:    dark ? '#E8E8F0' : '#111122',
+  };
+}
+
 function toggleTheme() {
   const html = document.documentElement;
   const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   html.setAttribute('data-theme', next);
   document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀' : '🌙';
   localStorage.setItem('theme', next);
+  updateChartThemes();
 }
+
+function updateChartThemes() {
+  const c = getThemeColors();
+  [paceChartInst, hrChartInst].forEach(chart => {
+    if (!chart) return;
+    chart.options.scales.x.grid.color  = c.border;
+    chart.options.scales.x.ticks.color = c.muted;
+    chart.options.scales.y.grid.color  = c.border;
+    chart.options.scales.y.ticks.color = c.muted;
+    chart.update();
+  });
+}
+
 (function initTheme() {
   const saved = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
   document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀' : '🌙';
 })();
 
-// ── Training week ────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function getMonday(d) {
+  const day  = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon  = new Date(d);
+  mon.setDate(d.getDate() + diff);
+  mon.setHours(0, 0, 0, 0);
+  return mon;
+}
+
 function getWeekNumber() {
-  const now   = new Date();
-  const diff  = now - BLOCK_START;
-  const week  = Math.floor(diff / (7 * 24 * 3600 * 1000));
+  const diff = new Date() - BLOCK_START;
+  const week = Math.floor(diff / (7 * 24 * 3600 * 1000));
   return Math.max(0, Math.min(week, WEEKLY_TARGETS.length - 1));
 }
 
-function getWeekTarget() {
-  return WEEKLY_TARGETS[getWeekNumber()] || 0;
+function getWeekTarget() { return WEEKLY_TARGETS[getWeekNumber()] || 0; }
+
+function fmtKm(m)  { return (m / 1000).toFixed(1); }
+function fmtDist(m){ return `${fmtKm(m)} km`; }
+
+function fmtPace(metersPerSecond) {
+  if (!metersPerSecond) return '—';
+  const secs = 1000 / metersPerSecond;
+  const m = Math.floor(secs / 60);
+  const s = Math.round(secs % 60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
-function getMonday(d) {
-  const day = d.getDay(); // 0=Sun
-  const diff = (day === 0) ? -6 : 1 - day;
-  const monday = new Date(d);
-  monday.setDate(d.getDate() + diff);
-  monday.setHours(0,0,0,0);
-  return monday;
+function fmtDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-MY', { day:'numeric', month:'short' });
+}
+
+function fmtWeekLabel(isoDate) {
+  return new Date(isoDate).toLocaleDateString('en-MY', { day:'numeric', month:'short' });
+}
+
+function paceClass(mps) {
+  if (!mps) return '';
+  const s = 1000 / mps;
+  if (s >= 540) return 'pace-good';
+  if (s >= 420) return 'pace-ok';
+  return 'pace-hard';
+}
+
+function hrColor(bpm) {
+  if (bpm < 128) return 'pace-good';
+  if (bpm < 159) return '';
+  if (bpm < 175) return 'pace-ok';
+  return 'pace-hard';
+}
+
+function truncate(str, n) {
+  return str.length > n ? str.slice(0, n) + '…' : str;
 }
 
 // ── OAuth ────────────────────────────────────────────────────────────────────
 function connectStrava() {
-  const scope = 'read,activity:read_all';
-  const url   = `https://www.strava.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${scope}`;
+  const url = `https://www.strava.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=read,activity:read_all`;
   window.location.href = url;
 }
 
 function handleStravaClick() {
-  const token = sessionStorage.getItem('strava_token');
-  if (token) {
+  if (sessionStorage.getItem('strava_token')) {
     sessionStorage.removeItem('strava_token');
-    sessionStorage.removeItem('strava_athlete');
-    document.getElementById('stravaBtn').textContent = 'Connect Strava';
+    document.getElementById('stravaBtn').innerHTML = stravaIcon() + ' Connect Strava';
     document.getElementById('stravaBtn').classList.remove('connected');
     document.getElementById('connectOverlay').classList.add('show');
   } else {
@@ -691,16 +810,15 @@ function handleStravaClick() {
   }
 }
 
+function stravaIcon(size=16) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>`;
+}
+
 async function exchangeCode(code) {
   const res = await fetch('https://www.strava.com/oauth/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      client_id:     CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      code,
-      grant_type:    'authorization_code',
-    }),
+    body: JSON.stringify({ client_id: CLIENT_ID, client_secret: CLIENT_SECRET, code, grant_type: 'authorization_code' }),
   });
   if (!res.ok) throw new Error('Token exchange failed');
   return res.json();
@@ -711,7 +829,7 @@ async function stravaGet(path, token) {
   const res = await fetch(`https://www.strava.com/api/v3${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(`Strava API error: ${res.status}`);
+  if (!res.ok) throw new Error(`Strava ${res.status}`);
   return res.json();
 }
 
@@ -727,152 +845,104 @@ async function fetchAllActivities(token) {
   return all.filter(a => a.type === 'Run' || a.sport_type === 'Run');
 }
 
-// ── Formatting ───────────────────────────────────────────────────────────────
-function fmtKm(m)   { return (m / 1000).toFixed(1); }
-function fmtDist(m) { return `${fmtKm(m)} km`; }
+// ── Render: This Week ────────────────────────────────────────────────────────
+function renderWeek(weekRuns) {
+  const now     = new Date();
+  const monday  = getMonday(now);
+  const days    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const dayKms  = Array(7).fill(0);
 
-function fmtPace(metersPerSecond) {
-  if (!metersPerSecond || metersPerSecond === 0) return '—';
-  const secsPerKm = 1000 / metersPerSecond;
-  const mins = Math.floor(secsPerKm / 60);
-  const secs = Math.round(secsPerKm % 60);
-  return `${mins}:${secs.toString().padStart(2,'0')}`;
-}
-
-function fmtTime(seconds) {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  if (h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-  return `${m}:${s.toString().padStart(2,'0')}`;
-}
-
-function fmtDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('en-MY', { day:'numeric', month:'short' });
-}
-
-function paceClass(metersPerSecond) {
-  if (!metersPerSecond) return '';
-  const secsPerKm = 1000 / metersPerSecond;
-  if (secsPerKm >= 540) return 'pace-good';  // ≥9:00/km = easy
-  if (secsPerKm >= 420) return 'pace-ok';    // 7–9 min
-  return 'pace-hard';
-}
-
-// ── Dashboard render ──────────────────────────────────────────────────────────
-function renderWeek(runs) {
-  const now    = new Date();
-  const monday = getMonday(now);
-  const days   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const dayKms = Array(7).fill(0);
-
-  runs.forEach(r => {
-    const d = new Date(r.start_date_local);
-    const dayIdx = Math.floor((d - monday) / (24*3600*1000));
-    if (dayIdx >= 0 && dayIdx < 7) dayKms[dayIdx] += r.distance;
+  weekRuns.forEach(r => {
+    const d   = new Date(r.start_date_local);
+    const idx = Math.floor((d - monday) / (24 * 3600 * 1000));
+    if (idx >= 0 && idx < 7) dayKms[idx] += r.distance;
   });
 
-  const todayIdx = ((now.getDay() + 6) % 7); // 0=Mon
-  const totalKm  = dayKms.reduce((a,b) => a+b, 0) / 1000;
+  const todayIdx = (now.getDay() + 6) % 7;
+  const totalKm  = dayKms.reduce((a,b) => a + b, 0) / 1000;
   const target   = getWeekTarget();
   const weekNum  = getWeekNumber() + 1;
   const maxKm    = Math.max(...dayKms, 1);
 
-  document.getElementById('weekBadge').textContent = `Week ${weekNum}`;
-  document.getElementById('weekKmDone').textContent = `${totalKm.toFixed(1)} km done`;
-  document.getElementById('weekTarget').textContent  = `target: ${target} km`;
-  document.getElementById('weekProgressFill').style.width = Math.min(100, (totalKm/target)*100) + '%';
+  document.getElementById('weekBadge').textContent     = `Week ${weekNum}`;
+  document.getElementById('weekKmDone').textContent    = `${totalKm.toFixed(1)} km done`;
+  document.getElementById('weekTarget').textContent    = `target: ${target} km`;
+  document.getElementById('weekProgressFill').style.width = Math.min(100, (totalKm / target) * 100) + '%';
 
   const barsEl = document.getElementById('weekBars');
   barsEl.innerHTML = '';
   days.forEach((day, i) => {
     const km   = dayKms[i] / 1000;
-    const pct  = km > 0 ? Math.max(8, (km / (maxKm/1000)) * 100) : 0;
-    const wrap = document.createElement('div');
-    wrap.className = 'day-bar-wrap';
-
-    const kmLabel = document.createElement('div');
-    kmLabel.className = 'day-km';
-    kmLabel.textContent = km > 0 ? km.toFixed(1) : '';
-
-    const bar  = document.createElement('div');
-    bar.className = 'day-bar' + (km === 0 ? ' empty' : '') + (i === todayIdx ? ' today' : '');
-    bar.style.height = (km > 0 ? pct : 10) + 'px';
-
-    const label = document.createElement('div');
-    label.className = 'day-label';
-    label.textContent = day;
-
-    wrap.appendChild(kmLabel);
-    wrap.appendChild(bar);
-    wrap.appendChild(label);
-    barsEl.appendChild(wrap);
+    const pct  = km > 0 ? Math.max(8, (km / (maxKm / 1000)) * 100) : 0;
+    barsEl.innerHTML += `
+      <div class="day-bar-wrap">
+        <div class="day-km">${km > 0 ? km.toFixed(1) : ''}</div>
+        <div class="day-bar${km === 0 ? ' empty' : ''}${i === todayIdx ? ' today' : ''}" style="height:${km > 0 ? pct : 10}px"></div>
+        <div class="day-label">${day}</div>
+      </div>`;
   });
 }
 
+// ── Render: PRs ──────────────────────────────────────────────────────────────
 function renderPRs(runs) {
   const prs = {
-    '1 km':        { best: 0, unit: '/km', isTime: false, bestDist: 0 },
-    '5 km':        { best: 0, unit: '/km', isTime: false, bestDist: 0 },
-    '10 km':       { best: 0, unit: '/km', isTime: false, bestDist: 0 },
-    'Half Marathon':{ best: 0, unit: '/km', isTime: false, bestDist: 0 },
-    'Longest Run': { best: 0, dist: 0 },
-    'Best Week':   { best: 0 },
+    '1 km':         { best: 0, name: '', date: '' },
+    '5 km':         { best: 0, name: '', date: '' },
+    '10 km':        { best: 0, name: '', date: '' },
+    'Half Marathon':{ best: 0, name: '', date: '' },
+    'Longest Run':  { dist: 0, name: '', date: '' },
+    'Best Week':    { km: 0,   date: '' },
   };
 
-  // Pace PRs (fastest speed = highest m/s)
   runs.forEach(r => {
-    const km   = r.distance / 1000;
-    const spd  = r.average_speed;
-    if (!spd) return;
-
-    if (km >= 1)    { if (spd > prs['1 km'].best)         prs['1 km'].best         = spd; }
-    if (km >= 5)    { if (spd > prs['5 km'].best)         prs['5 km'].best         = spd; }
-    if (km >= 10)   { if (spd > prs['10 km'].best)        prs['10 km'].best        = spd; }
-    if (km >= 20)   { if (spd > prs['Half Marathon'].best) prs['Half Marathon'].best = spd; }
-    if (r.distance > prs['Longest Run'].dist) prs['Longest Run'].dist = r.distance;
+    const km  = r.distance / 1000;
+    const spd = r.average_speed;
+    if (spd) {
+      if (km >= 1  && spd > prs['1 km'].best)          { prs['1 km']         = { best: spd, name: r.name, date: r.start_date_local }; }
+      if (km >= 5  && spd > prs['5 km'].best)          { prs['5 km']         = { best: spd, name: r.name, date: r.start_date_local }; }
+      if (km >= 10 && spd > prs['10 km'].best)         { prs['10 km']        = { best: spd, name: r.name, date: r.start_date_local }; }
+      if (km >= 20 && spd > prs['Half Marathon'].best) { prs['Half Marathon']= { best: spd, name: r.name, date: r.start_date_local }; }
+    }
+    if (r.distance > prs['Longest Run'].dist) {
+      prs['Longest Run'] = { dist: r.distance, name: r.name, date: r.start_date_local };
+    }
   });
 
   // Best week
   const weekMap = {};
   runs.forEach(r => {
-    const d      = new Date(r.start_date_local);
-    const monday = getMonday(d);
-    const key    = monday.toISOString().slice(0,10);
-    weekMap[key] = (weekMap[key] || 0) + r.distance;
+    const key = getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
+    weekMap[key] = (weekMap[key] || 0) + r.distance / 1000;
   });
-  const bestWeekKm = Math.max(0, ...Object.values(weekMap)) / 1000;
-  prs['Longest Run'].km = prs['Longest Run'].dist / 1000;
-  prs['Best Week'].km   = bestWeekKm;
+  let bestWk = 0, bestWkDate = '';
+  Object.entries(weekMap).forEach(([k, v]) => { if (v > bestWk) { bestWk = v; bestWkDate = k; } });
+  prs['Best Week'] = { km: bestWk, date: bestWkDate };
 
-  const grid = document.getElementById('prGrid');
   const entries = [
-    { label:'1 km',         value: prs['1 km'].best         ? fmtPace(prs['1 km'].best)         : '—', sub: 'best pace' },
-    { label:'5 km',         value: prs['5 km'].best         ? fmtPace(prs['5 km'].best)          : '—', sub: 'best pace' },
-    { label:'10 km',        value: prs['10 km'].best        ? fmtPace(prs['10 km'].best)         : '—', sub: 'best pace' },
-    { label:'Half Marathon',value: prs['Half Marathon'].best ? fmtPace(prs['Half Marathon'].best) : '—', sub: 'best pace /km' },
-    { label:'Longest Run',  value: prs['Longest Run'].km    ? prs['Longest Run'].km.toFixed(1) + ' km' : '—', sub: 'distance' },
-    { label:'Best Week',    value: bestWeekKm               ? bestWeekKm.toFixed(1) + ' km'             : '—', sub: 'weekly total' },
+    { label:'1 km',          value: prs['1 km'].best          ? fmtPace(prs['1 km'].best)          + '/km' : '—', meta: prs['1 km'].date          ? `${truncate(prs['1 km'].name,18)} · ${fmtDate(prs['1 km'].date)}`          : 'best pace' },
+    { label:'5 km',          value: prs['5 km'].best          ? fmtPace(prs['5 km'].best)          + '/km' : '—', meta: prs['5 km'].date          ? `${truncate(prs['5 km'].name,18)} · ${fmtDate(prs['5 km'].date)}`          : 'best pace' },
+    { label:'10 km',         value: prs['10 km'].best         ? fmtPace(prs['10 km'].best)         + '/km' : '—', meta: prs['10 km'].date         ? `${truncate(prs['10 km'].name,18)} · ${fmtDate(prs['10 km'].date)}`         : 'best pace' },
+    { label:'Half Marathon', value: prs['Half Marathon'].best ? fmtPace(prs['Half Marathon'].best) + '/km' : '—', meta: prs['Half Marathon'].date ? `${truncate(prs['Half Marathon'].name,18)} · ${fmtDate(prs['Half Marathon'].date)}` : 'best pace /km' },
+    { label:'Longest Run',   value: prs['Longest Run'].dist   ? (prs['Longest Run'].dist/1000).toFixed(1) + ' km' : '—', meta: prs['Longest Run'].date  ? `${truncate(prs['Longest Run'].name,18)} · ${fmtDate(prs['Longest Run'].date)}` : 'distance' },
+    { label:'Best Week',     value: bestWk                    ? bestWk.toFixed(1) + ' km' : '—',               meta: bestWkDate                  ? `w/c ${fmtDate(bestWkDate)}` : 'weekly total' },
   ];
 
-  grid.innerHTML = entries.map(e => `
+  document.getElementById('prGrid').innerHTML = entries.map(e => `
     <div class="pr-item">
       <div class="pr-distance">${e.label}</div>
       <div class="pr-value mono">${e.value}</div>
-      <div class="pr-subvalue">${e.sub}</div>
-    </div>
-  `).join('');
+      <div class="pr-subvalue">${e.meta}</div>
+    </div>`).join('');
 }
 
+// ── Render: Monthly ──────────────────────────────────────────────────────────
 function renderMonthly(runs) {
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const now    = new Date();
   const curMon = now.getMonth();
   const curYr  = now.getFullYear();
-
-  // Only 2026 months up to current
   const monthMap = {};
+
   runs.forEach(r => {
     const d = new Date(r.start_date_local);
     if (d.getFullYear() !== curYr) return;
@@ -881,58 +951,37 @@ function renderMonthly(runs) {
   });
 
   const months = [];
-  for (let m = 0; m <= curMon; m++) {
-    months.push({ m, km: (monthMap[m] || 0) / 1000 });
-  }
+  for (let m = 0; m <= curMon; m++) months.push({ m, km: (monthMap[m] || 0) / 1000 });
 
-  const maxKm = Math.max(...months.map(x=>x.km), 1);
-
-  const barsEl = document.getElementById('monthBars');
-  barsEl.innerHTML = months.map(({ m, km }) => `
+  const maxKm = Math.max(...months.map(x => x.km), 1);
+  document.getElementById('monthBars').innerHTML = months.map(({ m, km }) => `
     <div class="month-col">
       <div class="month-km">${km > 0 ? km.toFixed(0) : ''}</div>
       <div class="month-bar${m === curMon ? ' current' : ''}" style="height:${Math.max(4,(km/maxKm)*110)}px"></div>
       <div class="month-label">${MONTHS[m]}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
+// ── Render: Activities ───────────────────────────────────────────────────────
 function renderActivities(runs) {
-  const last10 = runs
-    .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
-    .slice(0, 10);
-
-  const tbody = document.getElementById('activityRows');
-  if (!last10.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);padding:12px 0">No runs found.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = last10.map(r => {
-    const hr  = r.average_heartrate ? `<span class="${hrColor(r.average_heartrate)}">${Math.round(r.average_heartrate)}</span>` : '—';
-    return `
+  const last10 = [...runs].sort((a,b) => new Date(b.start_date) - new Date(a.start_date)).slice(0,10);
+  document.getElementById('activityRows').innerHTML = last10.length
+    ? last10.map(r => `
       <tr>
         <td class="mono" style="color:var(--muted);white-space:nowrap">${fmtDate(r.start_date_local)}</td>
         <td><div class="activity-name">${r.name}</div></td>
         <td class="mono">${fmtDist(r.distance)}</td>
         <td class="mono ${paceClass(r.average_speed)}">${fmtPace(r.average_speed)}/km</td>
-        <td class="mono">${hr}</td>
-      </tr>
-    `;
-  }).join('');
+        <td class="mono">${r.average_heartrate ? `<span class="${hrColor(r.average_heartrate)}">${Math.round(r.average_heartrate)}</span>` : '—'}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" style="color:var(--muted);padding:12px 0">No runs found.</td></tr>';
 }
 
-function hrColor(bpm) {
-  if (bpm < 128) return 'pace-good';
-  if (bpm < 159) return '';
-  if (bpm < 175) return 'pace-ok';
-  return 'pace-hard';
-}
-
+// ── Render: HR Zones ─────────────────────────────────────────────────────────
 function renderHRZones(runs) {
-  const last30 = runs
+  const last30 = [...runs]
     .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
-    .slice(0, 30)
+    .slice(0,30)
     .filter(r => r.average_heartrate);
 
   const counts = { Z1:0, Z2:0, Z3:0, Z4:0 };
@@ -944,37 +993,273 @@ function renderHRZones(runs) {
     else                counts.Z4++;
   });
 
-  const total = last30.length || 1;
-  const zonesEl = document.getElementById('hrZones');
-  zonesEl.innerHTML = ['Z1','Z2','Z3','Z4'].map(z => {
-    const pct = Math.round((counts[z] / total) * 100);
-    const ranges = { Z1:'<128 bpm', Z2:'128–158', Z3:'159–174', Z4:'175+' };
-    return `
-      <div class="zone-row" title="${ranges[z]}">
-        <span class="zone-label">${z}</span>
-        <div class="zone-bar-bg">
-          <div class="zone-bar-fill" style="width:${pct}%;background:${ZONE_COLORS[z]}"></div>
-        </div>
-        <span class="zone-pct">${pct}%</span>
-      </div>
-    `;
-  }).join('') + `<div style="margin-top:16px;font-size:11px;color:var(--muted)">Based on max HR <span class="mono">183 bpm</span></div>`;
+  const total  = last30.length || 1;
+  const labels = { Z1:'Z1 <128', Z2:'Z2 128–158', Z3:'Z3 159–174', Z4:'Z4 175+' };
+
+  document.getElementById('hrZones').innerHTML =
+    ['Z1','Z2','Z3','Z4'].map(z => {
+      const pct = Math.round((counts[z] / total) * 100);
+      return `
+        <div class="zone-row">
+          <span class="zone-label">${labels[z]}</span>
+          <div class="zone-bar-bg"><div class="zone-bar-fill" style="width:${pct}%;background:${ZONE_COLORS[z]}"></div></div>
+          <span class="zone-pct">${pct}%</span>
+        </div>`;
+    }).join('') +
+    `<div style="margin-top:16px;font-size:11px;color:var(--muted)">Max HR <span class="mono">183 bpm</span></div>`;
 }
 
-// ── Main init ────────────────────────────────────────────────────────────────
+// ── Render: Pace Trend ───────────────────────────────────────────────────────
+function renderPaceTrend(runs) {
+  const weekMap = {};
+  runs.forEach(r => {
+    if (!r.average_heartrate || r.average_heartrate >= EASY_HR_MAX) return;
+    if (!r.average_speed) return;
+    const key = getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
+    if (!weekMap[key]) weekMap[key] = { total: 0, count: 0 };
+    weekMap[key].total += 1000 / r.average_speed; // secs per km
+    weekMap[key].count++;
+  });
+
+  const weeks = Object.entries(weekMap)
+    .sort(([a],[b]) => a.localeCompare(b))
+    .slice(-12)
+    .map(([key, val]) => ({ label: fmtWeekLabel(key), pace: val.total / val.count }));
+
+  if (paceChartInst) { paceChartInst.destroy(); paceChartInst = null; }
+  if (!weeks.length) {
+    document.getElementById('paceChart').parentElement.innerHTML = '<div style="color:var(--muted);font-size:12px;font-family:DM Mono,monospace;padding-top:60px;text-align:center">No easy runs found</div>';
+    return;
+  }
+
+  const c = getThemeColors();
+  paceChartInst = new Chart(document.getElementById('paceChart'), {
+    type: 'line',
+    data: {
+      labels: weeks.map(w => w.label),
+      datasets: [{
+        data:                weeks.map(w => w.pace),
+        borderColor:         '#2DD4BF',
+        backgroundColor:     'rgba(45,212,191,0.08)',
+        pointBackgroundColor:'#2DD4BF',
+        pointRadius:         4,
+        pointHoverRadius:    6,
+        tension:             0.35,
+        fill:                true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const s = ctx.raw;
+              const m = Math.floor(s / 60);
+              const sec = Math.round(s % 60);
+              return ` ${m}:${sec.toString().padStart(2,'0')}/km`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid:  { color: c.border },
+          ticks: { color: c.muted, font: { family: 'DM Mono', size: 10 } },
+        },
+        y: {
+          reverse: true, // up = faster
+          grid:  { color: c.border },
+          ticks: {
+            color: c.muted,
+            font:  { family: 'DM Mono', size: 10 },
+            callback: val => {
+              const m = Math.floor(val / 60);
+              const s = Math.round(val % 60);
+              return `${m}:${s.toString().padStart(2,'0')}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ── Render: HR Trend ─────────────────────────────────────────────────────────
+function renderHRTrend(runs) {
+  const weekMap = {};
+  runs.forEach(r => {
+    if (!r.average_heartrate) return;
+    const key = getMonday(new Date(r.start_date_local)).toISOString().slice(0,10);
+    if (!weekMap[key]) weekMap[key] = { total: 0, count: 0 };
+    weekMap[key].total += r.average_heartrate;
+    weekMap[key].count++;
+  });
+
+  const weeks = Object.entries(weekMap)
+    .sort(([a],[b]) => a.localeCompare(b))
+    .slice(-12)
+    .map(([key, val]) => ({ label: fmtWeekLabel(key), hr: val.total / val.count }));
+
+  if (hrChartInst) { hrChartInst.destroy(); hrChartInst = null; }
+  if (!weeks.length) return;
+
+  const c = getThemeColors();
+  hrChartInst = new Chart(document.getElementById('hrTrendChart'), {
+    type: 'line',
+    data: {
+      labels: weeks.map(w => w.label),
+      datasets: [{
+        data:                weeks.map(w => Math.round(w.hr)),
+        borderColor:         '#F87171',
+        backgroundColor:     'rgba(248,113,113,0.08)',
+        pointBackgroundColor:'#F87171',
+        pointRadius:         4,
+        pointHoverRadius:    6,
+        tension:             0.35,
+        fill:                true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.raw} bpm` } }
+      },
+      scales: {
+        x: {
+          grid:  { color: c.border },
+          ticks: { color: c.muted, font: { family: 'DM Mono', size: 10 } },
+        },
+        y: {
+          grid:  { color: c.border },
+          ticks: { color: c.muted, font: { family: 'DM Mono', size: 10 }, callback: val => `${val} bpm` }
+        }
+      }
+    }
+  });
+}
+
+// ── Render: Cadence ──────────────────────────────────────────────────────────
+function renderCadence(runs) {
+  const withCad = [...runs]
+    .sort((a,b) => new Date(b.start_date) - new Date(a.start_date))
+    .slice(0,30)
+    .filter(r => r.average_cadence);
+
+  if (!withCad.length) { document.getElementById('cadenceVal').textContent = '—'; return; }
+  const avg = withCad.reduce((a,r) => a + r.average_cadence, 0) / withCad.length;
+  document.getElementById('cadenceVal').textContent = Math.round(avg * 2); // one-foot → total
+}
+
+// ── Render: Streak ───────────────────────────────────────────────────────────
+function renderStreak(runs) {
+  const days = new Set(runs.map(r => r.start_date_local.slice(0,10)));
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  let streak = 0;
+  let d = new Date(today);
+
+  // If no run today, start checking from yesterday
+  const todayKey = d.toISOString().slice(0,10);
+  if (!days.has(todayKey)) d.setDate(d.getDate() - 1);
+
+  while (true) {
+    const key = d.toISOString().slice(0,10);
+    if (days.has(key)) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+
+  document.getElementById('streakVal').textContent = streak;
+  document.getElementById('streakSub').textContent = streak === 1 ? 'day streak' : 'day streak';
+}
+
+// ── Render: Days Run ─────────────────────────────────────────────────────────
+function renderDaysComparison(runs) {
+  const now       = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear  = now.getFullYear();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const lastYear  = thisMonth === 0 ? thisYear - 1 : thisYear;
+
+  const thisSet = new Set(), lastSet = new Set();
+  runs.forEach(r => {
+    const d = new Date(r.start_date_local);
+    const key = r.start_date_local.slice(0,10);
+    if (d.getFullYear() === thisYear && d.getMonth() === thisMonth) thisSet.add(key);
+    if (d.getFullYear() === lastYear && d.getMonth() === lastMonth) lastSet.add(key);
+  });
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('daysVal').textContent = thisSet.size;
+  document.getElementById('daysSub').textContent = `vs ${lastSet.size} in ${MONTHS[lastMonth]}`;
+}
+
+// ── Render: Weekly Target % ──────────────────────────────────────────────────
+function renderWeeklyTargetPct(runs) {
+  const now     = new Date();
+  const results = [];
+
+  WEEKLY_TARGETS.forEach((target, i) => {
+    const weekStart = new Date(BLOCK_START);
+    weekStart.setDate(weekStart.getDate() + i * 7);
+    if (weekStart > now) return;
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    const actual = runs
+      .filter(r => { const d = new Date(r.start_date_local); return d >= weekStart && d < weekEnd; })
+      .reduce((a,r) => a + r.distance / 1000, 0);
+
+    const pct = Math.min(110, Math.round((actual / target) * 100));
+    results.push({ week: i + 1, pct, actual: actual.toFixed(1), target });
+  });
+
+  if (!results.length) {
+    document.getElementById('targetBars').innerHTML = '<div style="color:var(--muted);font-size:12px;font-family:DM Mono,monospace">Training block starts 22 Jun 2026</div>';
+    return;
+  }
+
+  const el = document.getElementById('targetBars');
+  el.innerHTML = results.map(r => {
+    const barClass = r.pct >= 100 ? 'hit' : r.pct >= 70 ? 'partial' : 'low';
+    const barH     = Math.max(4, (r.pct / 110) * 90);
+    return `
+      <div class="target-col" title="W${r.week}: ${r.actual}km / ${r.target}km (${r.pct}%)">
+        <div class="target-pct-label">${r.pct}%</div>
+        <div class="target-bar ${barClass}" style="height:${barH}px"></div>
+        <div class="target-week-label">W${r.week}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Render: Calories ─────────────────────────────────────────────────────────
+function renderCalories(weekRuns) {
+  const total = weekRuns.reduce((a,r) => {
+    return a + (r.calories || (r.kilojoules ? r.kilojoules * 0.239 : 0));
+  }, 0);
+  document.getElementById('caloriesVal').textContent = total > 0 ? Math.round(total).toLocaleString() : '—';
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const code   = params.get('code');
   let token    = sessionStorage.getItem('strava_token');
 
-  // Clear code from URL
   if (code) {
     window.history.replaceState({}, '', window.location.pathname);
     try {
       const data = await exchangeCode(code);
       token = data.access_token;
       sessionStorage.setItem('strava_token', token);
-      sessionStorage.setItem('strava_athlete', JSON.stringify(data.athlete));
     } catch(e) {
       console.error(e);
       document.getElementById('connectOverlay').classList.add('show');
@@ -987,23 +1272,14 @@ async function init() {
     return;
   }
 
-  // Show connected state
   const btn = document.getElementById('stravaBtn');
-  btn.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/>
-    </svg>
-    Connected ✓
-  `;
+  btn.innerHTML = stravaIcon() + ' Connected ✓';
   btn.classList.add('connected');
   document.getElementById('connectOverlay').classList.remove('show');
 
-  // Fetch and render
   try {
-    const runs = await fetchAllActivities(token);
-
-    // Get this week's runs
-    const monday = getMonday(new Date());
+    const runs     = await fetchAllActivities(token);
+    const monday   = getMonday(new Date());
     const weekRuns = runs.filter(r => new Date(r.start_date_local) >= monday);
 
     renderWeek(weekRuns);
@@ -1011,15 +1287,21 @@ async function init() {
     renderMonthly(runs);
     renderActivities(runs);
     renderHRZones(runs);
+    renderPaceTrend(runs);
+    renderHRTrend(runs);
+    renderCadence(runs);
+    renderStreak(runs);
+    renderDaysComparison(runs);
+    renderWeeklyTargetPct(runs);
+    renderCalories(weekRuns);
 
   } catch(e) {
     console.error(e);
-    // Token might be expired
     if (e.message.includes('401') || e.message.includes('403')) {
       sessionStorage.removeItem('strava_token');
-      document.getElementById('connectOverlay').classList.add('show');
-      btn.textContent = 'Connect Strava';
+      btn.innerHTML = stravaIcon() + ' Connect Strava';
       btn.classList.remove('connected');
+      document.getElementById('connectOverlay').classList.add('show');
     }
   }
 }
